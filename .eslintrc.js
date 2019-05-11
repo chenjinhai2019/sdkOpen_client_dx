@@ -52,5 +52,6 @@ module.exports = {
     'linebreak-style': 0,
     'semi': 0,
     'max-len': 0,
+    'no-console':0
   }
 }

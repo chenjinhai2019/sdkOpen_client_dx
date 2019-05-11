@@ -42,6 +42,9 @@ export default new Router({
       path: '/manageCenter',
       name: 'manageCenter',
       component: resolve => require(['views/ManageCenter/ManageCenter.vue'], resolve),
+      meta: {
+        hideHeader: true,
+      },
     },
   ],
 });
