@@ -1,0 +1,12 @@
+{
+  "bannerLists":[
+    { 
+      "title":"图片1",
+      "src":"static/images/banner1.jpg"
+    },
+    { 
+      "title":"图片2",
+      "src":"static/images/banner2.jpg"
+    }
+  ]
+}

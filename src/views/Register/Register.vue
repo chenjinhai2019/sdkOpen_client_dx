@@ -1,5 +1,6 @@
 <template>
- <div class="register-wrap">
+ <div>
+   <div class="register-wrap">
     <h3 class="title">欢迎注册晶讯开放平台</h3>
     <el-row class="inp-item">
       <el-input v-model="username" clearable placeholder="用户名" @focus="usernameTip=true" @blur="usernameTip=false"></el-input>
@@ -8,7 +9,7 @@
         <li>* 长度4-16</li>
         <li>* 请勿用身份证/银行卡等隐私信息作为您的用户名</li>
       </ul>
-      <div class="username-errTip errTip"></div>
+      <div class="username-errTip errTip">{{usernameErrTip}}</div>
     </el-row>
     <el-row class="inp-item">
       <el-input v-model="email" clearable placeholder="邮箱" @focus="emailTip=true" @blur="emailTip=false"></el-input>
@@ -43,12 +44,16 @@
       <el-checkbox v-model="isChecked" style="margin-right:0;">我已阅读</el-checkbox><a @click.prevent="">《服务协议》</a>
     </el-row>
     <el-row>
-      <el-button type="primary" size="medium" class="login-btn" @click="register()">注册</el-button>
+      <el-button type="primary" size="medium" @click="register()">注册</el-button>
     </el-row>
   </div>
+  <Footer></Footer>
+ </div>
 </template>
 
 <script>
+import Footer from 'layout/Footer'
+
 export default {
   data() {
     return {
@@ -63,13 +68,17 @@ export default {
       emailTip: false,
       passwordTip: false,
       checkPsdTip: false,
+      usernameErrTip: '',
       emailErrTip: '',
     }
   },
   methods: {
     register() {
-      const { email } = this;
+      const { email, username } = this;
       const regEmail = /^[A-Za-zd]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/;
+      if (username === '') {
+        this.usernameErrTip = '请输入用户名'
+      }
       if (email === '') {
         this.emailErrTip = '请输入邮箱'
         this.timer = setTimeout(() => {
@@ -83,6 +92,9 @@ export default {
       }
     },
   },
+  components: {
+    Footer,
+  },
   beforeDestroy() {
     clearTimeout(this.timer);
   },
@@ -95,6 +107,7 @@ export default {
     margin 0 auto
     text-align center
     padding-top 50px
+    padding-bottom 20px
     .title
       width 100%
       border-bottom 1px solid #ccc

@@ -3,7 +3,7 @@ import Router from 'vue-router';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   routes: [
     { path: '/', redirect: '/home' },
     { path: '/home', component: resolve => require(['views/Home/Home'], resolve) },
@@ -44,7 +44,25 @@ export default new Router({
       component: resolve => require(['views/ManageCenter/ManageCenter.vue'], resolve),
       meta: {
         hideHeader: true,
+        requireAuth: true,
       },
     },
   ],
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(res => res.meta.requireAuth)) { // 判断是否需要登录权限
+    if (document.cookie.indexOf('username') !== -1) { // 已登录
+      next()
+    } else { // 未登录
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath },
+      })
+    }
+  } else { // 不需要登录权限
+    next()
+  }
+})
+
+export default router;
