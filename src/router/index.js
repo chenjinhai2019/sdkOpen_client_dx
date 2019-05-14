@@ -38,6 +38,7 @@ const router = new Router({
       name: 'developDoc',
       component: resolve => require(['views/DevelopDoc/DevelopDoc.vue'], resolve),
     },
+    { path: '/manageCenter', redirect: '/applicationManage' },
     {
       path: '/manageCenter',
       name: 'manageCenter',
@@ -46,8 +47,35 @@ const router = new Router({
         hideHeader: true,
         requireAuth: true,
       },
+      children: [
+        {
+          path: '/applicationManage',
+          name: 'applicationManage',
+          component: resolve => require(['views/ManageCenter/ApplicationManage/ApplicationManage'], resolve),
+          meta: {
+            hideHeader: true
+          }
+        },
+        {
+          path: '/productManage',
+          name: 'productManage',
+          component: resolve => require(['views/ManageCenter/ProductManage/ProductManage'], resolve),
+          meta: {
+            hideHeader: true
+          }
+        },
+        {
+          path: '/valueService',
+          name: 'valueService',
+          component: resolve => require(['views/ManageCenter/ValueService/ValueService'], resolve),
+          meta: {
+            hideHeader: true
+          }
+        },
+      ],
     },
   ],
+  linkActiveClass: 'active'
 });
 
 router.beforeEach((to, from, next) => {

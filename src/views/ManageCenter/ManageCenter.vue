@@ -1,10 +1,13 @@
 <template>
   <div class="">
-      我是管理中心页面
+    <ManageCenterHeader /> 
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
+import ManageCenterHeader from 'layout/ManageCenterHeader'
+
 export default {
   name: '',
   data() { 
@@ -12,9 +15,12 @@ export default {
 
     }
   },
+  components: {
+    ManageCenterHeader
+  },
 }
 </script>
 
-<style lang="" scoped>
+<style lang="stylus" scoped>
 
 </style>

@@ -55,6 +55,7 @@ module.exports = {
     'no-console':0,
     'import/prefer-default-export': 0,
     'no-unused-vars': 0,
-    'no-new': 0
+    'no-new': 0,
+    'comma-dangle': 0
   }
 }

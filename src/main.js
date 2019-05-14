@@ -8,6 +8,7 @@ import store from './store';
 import axios from 'axios'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import 'font-awesome/css/font-awesome.min.css'
 import './mock/mockServer'; // 加载mockServer
 
 Vue.prototype.$axios = axios; // 全局注册axios
