@@ -56,6 +56,8 @@ module.exports = {
     'import/prefer-default-export': 0,
     'no-unused-vars': 0,
     'no-new': 0,
-    'comma-dangle': 0
+    'comma-dangle': 0,
+    'no-plusplus': 0,
+    'consistent-return':0
   }
 }

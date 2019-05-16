@@ -38,7 +38,7 @@ const router = new Router({
       name: 'developDoc',
       component: resolve => require(['views/DevelopDoc/DevelopDoc.vue'], resolve),
     },
-    { path: '/manageCenter', redirect: '/applicationManage' },
+    { path: '/manageCenter', redirect: '/manageCenter/applicationManage' },
     {
       path: '/manageCenter',
       name: 'manageCenter',
@@ -49,15 +49,35 @@ const router = new Router({
       },
       children: [
         {
-          path: '/applicationManage',
+          path: 'applicationManage',
           name: 'applicationManage',
           component: resolve => require(['views/ManageCenter/ApplicationManage/ApplicationManage'], resolve),
           meta: {
             hideHeader: true
-          }
+          },
+          children: [
+            {
+              path: 'oemApply',
+              name: 'oemApply',
+              component: resolve => require(['views/ManageCenter/ApplicationManage/OEMApply'], resolve),
+              meta: {
+                hideHeader: true,
+                activeMenu: '/manageCenter/applicationManage'
+              },
+            }, 
+            {
+              path: 'sdkApply',
+              name: 'sdkApply',
+              component: resolve => require(['views/ManageCenter/ApplicationManage/SDKApply'], resolve),
+              meta: {
+                hideHeader: true,
+                activeMenu: '/manageCenter/applicationManage'
+              }
+            },
+          ]
         },
         {
-          path: '/productManage',
+          path: 'productManage',
           name: 'productManage',
           component: resolve => require(['views/ManageCenter/ProductManage/ProductManage'], resolve),
           meta: {
@@ -65,7 +85,7 @@ const router = new Router({
           }
         },
         {
-          path: '/valueService',
+          path: 'valueService',
           name: 'valueService',
           component: resolve => require(['views/ManageCenter/ValueService/ValueService'], resolve),
           meta: {

@@ -7,10 +7,10 @@
         </router-link>
       </el-col>
       <el-col class="managecenter-menu">
-        <el-menu :default-active="$route.path" active-text-color="#1890ff" mode="horizontal" :router="true">
-          <el-menu-item index="/applicationManage">应用管理</el-menu-item>
-          <el-menu-item index="/productManage">产品管理</el-menu-item>
-          <el-menu-item index="/valueService">增值服务</el-menu-item>
+        <el-menu :default-active="activeMenu" active-text-color="#1890ff" mode="horizontal" :router="true">
+          <el-menu-item index="/manageCenter/applicationManage">应用管理</el-menu-item>
+          <el-menu-item index="/manageCenter/productManage">产品管理</el-menu-item>
+          <el-menu-item index="/manageCenter/valueService">增值服务</el-menu-item>
         </el-menu>
       </el-col>
       <el-col class="right-box">
@@ -33,6 +33,19 @@ export default {
 
     }
   },
+  computed: {
+    activeMenu() {
+      const route = this.$route;
+      const { meta, path } = route;
+      if (meta.activeMenu) {
+        return meta.activeMenu
+      }
+      return path;
+    },
+  },
+  mounted() {
+    
+  }
 }
 </script>
 
