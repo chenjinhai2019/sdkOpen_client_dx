@@ -25,19 +25,19 @@
         <li>* 6-16个字符</li>
         <li>* 字母、数字和标点符号至少包含两种</li>
       </ul>
-      <div class="password-errTip errTip"></div>
+      <div class="password-errTip errTip">{{passwordErrTip}}</div>
     </el-row>
     <el-row class="inp-item">
       <el-input v-model="checkPsd" clearable placeholder="确认密码" @focus="checkPsdTip=true" @blur="checkPsdTip=false"></el-input>
       <ul class="tip checkPsd-tip" v-show="checkPsdTip">
         <li>* 请再次输入您的密码</li>
       </ul>
-      <div class="checkPsd-errTip errTip"></div>
+      <div class="checkPsd-errTip errTip">{{checkPsdErrTip}}</div>
     </el-row>
     <el-row class="captcha-box inp-item">
       <el-input maxlength="11" clearable placeholder="验证码" v-model="captcha"></el-input>
       <img class="get_verification" src="./images/captcha.svg" alt="captcha" >
-      <div class="captcha-errTip errTip"></div>
+      <div class="captcha-errTip errTip">{{captchaErrTip}}</div>
     </el-row>
     
     <el-row class="checked-box">
@@ -70,14 +70,21 @@ export default {
       checkPsdTip: false,
       usernameErrTip: '',
       emailErrTip: '',
+      passwordErrTip: '',
+      checkPsdErrTip: '',
+      captchaErrTip: ''
+
     }
   },
   methods: {
     register() {
-      const { email, username } = this;
-      const regEmail = /^[A-Za-zd]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/;
+      const { email, username, password, checkPsd, captcha } = this;
+      const regEmail = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
       if (username === '') {
         this.usernameErrTip = '请输入用户名'
+        this.timer = setTimeout(() => {
+          this.usernameErrTip = '';   
+        }, 2000)
       }
       if (email === '') {
         this.emailErrTip = '请输入邮箱'
@@ -88,6 +95,32 @@ export default {
         this.emailErrTip = '邮箱格式不正确'
         this.timer = setTimeout(() => {
           this.emailErrTip = '';   
+        }, 2000)
+      }
+      if (password === '') {
+        this.passwordErrTip = '请输入密码'
+        this.timer = setTimeout(() => {
+          this.passwordErrTip = '';   
+        }, 2000)
+      }
+      if (checkPsd === '') {
+        this.checkPsdErrTip = '请再次输入密码'
+        this.timer = setTimeout(() => {
+          this.checkPsdErrTip = '';   
+        }, 2000)
+      }
+      if (password !== '' && checkPsd !== '') {
+        if (password !== checkPsd) {
+          this.checkPsdErrTip = '两次密码输入不一致'
+          this.timer = setTimeout(() => {
+            this.checkPsdErrTip = '';   
+          }, 2000)
+        }
+      }
+      if (captcha === '') {
+        this.captchaErrTip = '验证码不能为空'
+        this.timer = setTimeout(() => {
+          this.captchaErrTip = '';   
         }, 2000)
       }
     },
