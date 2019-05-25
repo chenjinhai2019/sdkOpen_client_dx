@@ -10,7 +10,7 @@
           <el-input placeholder="密码" v-model="password" show-password></el-input>
         </el-row>
         <el-row>
-          <el-button type="primary" size="medium" class="login-btn">登录</el-button>
+          <el-button type="primary" size="medium" class="login-btn" @click="login">登录</el-button>
         </el-row>
         <el-row type="flex" justify="space-between" class="link-wrapper">
           <el-col>
@@ -35,6 +35,18 @@ export default {
     return {
       username: '',
       password: '',
+    }
+  },
+  methods: {
+    login() {
+      const { username, password } = this;
+      const params = {
+        accout: username,
+        password
+      }
+      this.$axios.get('/userinfo', { params }).then((res) => {
+        console.log(res);
+      })
     }
   },
   components: {

@@ -58,6 +58,7 @@ module.exports = {
     'no-new': 0,
     'comma-dangle': 0,
     'no-plusplus': 0,
-    'consistent-return':0
+    'consistent-return':0,
+    'prefer-const': 0
   }
 }
