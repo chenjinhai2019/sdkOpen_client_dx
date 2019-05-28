@@ -88,6 +88,7 @@ export default {
       }
       if (password !== '' && checkPsd !== '') {
         if (password !== checkPsd) {
+          validator = false;
           this.checkPsdErrTip = '两次密码输入不一致'
           this.timer = setTimeout(() => {
             this.checkPsdErrTip = '';   
@@ -117,6 +118,10 @@ export default {
               message: '修改密码成功，请激活邮件完成密码的修改',
               type: 'success'
             });
+            email = '';
+            password = '';
+            checkPsd = '';
+            captcha = '';
           } else {
             this.$message({
               message: `${res.data.msg}`,

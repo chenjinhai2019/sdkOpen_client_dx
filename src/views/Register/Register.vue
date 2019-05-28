@@ -115,8 +115,8 @@ export default {
         }, 2000)
       }
       if (password !== '' && checkPsd !== '') {
-        validator = false;
         if (password !== checkPsd) {
+          validator = false;
           this.checkPsdErrTip = '两次密码输入不一致'
           this.timer = setTimeout(() => {
             this.checkPsdErrTip = '';   
@@ -154,12 +154,12 @@ export default {
                 message: '注册成功，请激活邮件完成注册',
                 type: 'success'
               });
-              /* username = '';
+              username = '';
               email = '';
               password = '';
               checkPsd = '';
               captcha = '';
-              this.timer = setTimeout(() => {
+              /* this.timer = setTimeout(() => {
                 this.$router.push({
                   path: '/login'
                 })
