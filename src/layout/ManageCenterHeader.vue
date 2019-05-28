@@ -18,7 +18,7 @@
           <router-link to="/developDoc" class="developdoc"><i class="fa fa-file-text-o" aria-hidden="true"></i> 开发文档</router-link>
         </div>
         <div class="welcome-wrap">
-          <div class="welcome">hello,XXX</div>
+          <div class="welcome">hello,{{username}}</div>
         </div>
       </el-col>
     </el-row>
@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: '',
   data() { 
@@ -34,6 +36,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      username: state => state.username
+    }),
     activeMenu() {
       const route = this.$route;
       const { meta, path } = route;

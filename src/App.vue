@@ -10,6 +10,9 @@ import Header from 'layout/Header'
 
 export default {
   name: 'App',
+  mounted() {
+    this.$store.dispatch('getUserInfo');
+  },
   components: {
     Header,
   },

@@ -14,11 +14,10 @@ module.exports = {
       '/':{
         target: 'http://192.168.3.30:80',
         changeOrigin: true,
+        pathRewrite: {
+          '^/': ''
+        }
       },
-      '/**':{
-        target: 'http://192.168.3.30:80',
-        changeOrigin: true,
-      }
     },
 
     // Various Dev Server settings

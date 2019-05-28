@@ -28,6 +28,7 @@
 
 <script>
 import Footer from 'layout/Footer'
+import Cookies from 'js-cookie'
 
 export default {
   name: '',
@@ -41,11 +42,41 @@ export default {
     login() {
       const { username, password } = this;
       const params = {
-        accout: username,
+        account: username,
         password
       }
       this.$axios.get('/userinfo', { params }).then((res) => {
-        console.log(res);
+        if (res.data.success === true) {
+          this.$message({
+            message: '登录成功',
+            type: 'success'
+          });
+          console.log(res.data);
+          const user = res.data.data.username;
+          this.$store.dispatch('userInfo', user);
+          Cookies.set('username', username);
+
+          // 判断是否需要跳回到路由拦截的页面
+          let oldPath = this.$route.query.redirect;
+          if (oldPath) {
+            this.timer = setTimeout(() => {
+              this.$router.push({
+                path: `${oldPath}`
+              })
+            }, 500);
+          } else {
+            this.timer = setTimeout(() => {
+              this.$router.push({
+                path: '/home'
+              })
+            }, 500);
+          }
+        } else {
+          this.$message({
+            message: `${res.data.msg}`,
+            type: 'error'
+          });
+        }
       })
     }
   },

@@ -16,7 +16,7 @@
           </div>
           <el-dropdown class="welcome-container" trigger="click" v-else>
             <div class="welcome-wrap">
-              <div class="welcome">hello,XXX</div>
+              <div class="welcome">hello,{{username}}</div>
               <i class="el-icon-caret-bottom"/>
             </div>
             <el-dropdown-menu slot="dropdown">
@@ -30,7 +30,7 @@
                 <el-dropdown-item>订阅</el-dropdown-item>
               </router-link>
               <el-dropdown-item divided>
-                <span>退出</span>
+                <span @click="logout">退出</span>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -47,10 +47,21 @@
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
+
 export default {
+  computed: {
+    ...mapState({
+      username: state => state.username
+    }),
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch('removeUserInfo', this.$router);
+    }
+  },
   data() {
     return {
-      username: false,
     }
   },
 }

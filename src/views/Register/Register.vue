@@ -19,7 +19,7 @@
       <div class="email-errTip errTip">{{emailErrTip}}</div>
     </el-row>
     <el-row class="inp-item">
-      <el-input v-model="password" clearable placeholder="密码" @focus="passwordTip=true" @blur="passwordTip=false"></el-input>
+      <el-input v-model="password" show-password clearable placeholder="密码" @focus="passwordTip=true" @blur="passwordTip=false"></el-input>
       <ul class="tip password-tip" v-show="passwordTip">
         <li>* 密码可由字母、数字、标点符号组成</li>
         <li>* 6-16个字符</li>
@@ -28,7 +28,7 @@
       <div class="password-errTip errTip">{{passwordErrTip}}</div>
     </el-row>
     <el-row class="inp-item">
-      <el-input v-model="checkPsd" clearable placeholder="确认密码" @focus="checkPsdTip=true" @blur="checkPsdTip=false"></el-input>
+      <el-input v-model="checkPsd" show-password clearable placeholder="确认密码" @focus="checkPsdTip=true" @blur="checkPsdTip=false"></el-input>
       <ul class="tip checkPsd-tip" v-show="checkPsdTip">
         <li>* 请再次输入您的密码</li>
       </ul>
@@ -36,7 +36,7 @@
     </el-row>
     <el-row class="captcha-box inp-item">
       <el-input maxlength="11" clearable placeholder="验证码" v-model="captcha" @blur="checkCaptcha"></el-input>
-      <img class="get_verification" src="http://192.168.3.30/userinfo/captcha" alt="captcha" @click='getCaptcha()' ref='captcha'>
+      <img class="get_verification" src="/userinfo/captcha" alt="captcha" @click='getCaptcha()' ref='captcha'>
       <div class="captcha-errTip errTip">{{captchaErrTip}}</div>
     </el-row>
     
@@ -75,6 +75,9 @@ export default {
       checkPsdErrTip: '',
       captchaErrTip: ''
     }
+  },
+  mounted() {
+    
   },
   methods: {
     register() {
@@ -127,15 +130,17 @@ export default {
           this.captchaErrTip = '';   
         }, 2000)
       }
+      // 校验验证码是否一致
+      this.checkCaptcha();
       if (username && email && password && checkPsd && captcha && password === checkPsd) {
         validator = true
       }
-      const params = {
+      const params = this.$qs.stringify({
         username,
         email,
         password,
         captcha
-      }
+      })
       if (validator) {
         if (!isChecked) {
           this.$alert('请阅读服务协议并同意', '', {
@@ -146,10 +151,10 @@ export default {
           this.$axios.post('/userinfo', params).then((res) => {
             if (res.data.success === true) {
               this.$message({
-                message: '注册成功，请登录',
+                message: '注册成功，请激活邮件完成注册',
                 type: 'success'
               });
-              username = '';
+              /* username = '';
               email = '';
               password = '';
               checkPsd = '';
@@ -158,7 +163,12 @@ export default {
                 this.$router.push({
                   path: '/login'
                 })
-              }, 500)
+              }, 500) */
+            } else {
+              this.$message({
+                message: `${res.data.msg}`,
+                type: 'error'
+              });
             }
           }).catch((err) => {
 
@@ -183,7 +193,7 @@ export default {
           if (res.data.success === false) {
             this.usernameErrTip = '该用户名已被注册'
             this.timer = setTimeout(() => {
-              this.usernameErrTip = '';   
+              this.usernameErrTip = '';
             }, 2000)
             this.validator = false;
           } 
@@ -237,9 +247,9 @@ export default {
       }
       if (captcha) {
         this.$axios.get('/userinfo/checkCaptcha', { params }).then((res) => {
-          this.validator = false;
           if (res.data.success === false) {
-            this.captchaErrTip = '验证码错误，请点击右侧图片刷新重试'
+            this.validator = false;
+            this.captchaErrTip = '验证码错误，请重新输入'
             this.timer = setTimeout(() => {
               this.captchaErrTip = '';   
             }, 2000)
@@ -251,8 +261,7 @@ export default {
       }
     },
     getCaptcha() {
-      // event.target.src = 'http://192.168.3.30/userinfo/captcha?time='+Date.now()
-      this.$refs.captcha.src = `http://192.168.3.30/userinfo/captcha?time=${Date.now()}`;
+      this.$refs.captcha.src = `/userinfo/captcha?time=${Date.now()}`;
     }
   },
   components: {

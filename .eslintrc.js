@@ -59,6 +59,7 @@ module.exports = {
     'comma-dangle': 0,
     'no-plusplus': 0,
     'consistent-return':0,
-    'prefer-const': 0
+    'prefer-const': 0,
+    'no-param-reassign': 0
   }
 }

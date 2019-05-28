@@ -26,8 +26,8 @@
       <div class="checkPsd-errTip errTip">{{checkPsdErrTip}}</div>
     </el-row>
     <el-row class="captcha-box inp-item">
-      <el-input maxlength="11" clearable placeholder="验证码" v-model="captcha"></el-input>
-      <img class="get_verification" src="./images/captcha.svg" alt="captcha" >
+      <el-input maxlength="11" clearable placeholder="验证码" v-model="captcha" @blur="checkCaptcha"></el-input>
+      <img class="get_verification" src="/userinfo/captcha" alt="captcha" ref="captcha" @click='getCaptcha()'>
       <div class="captcha-errTip errTip">{{captchaErrTip}}</div>
     </el-row>
     <el-row>
@@ -44,6 +44,7 @@ import Footer from 'layout/Footer'
 export default {
   data() {
     return {
+      validator: false,
       timer: null,
       email: '',
       password: '',
@@ -60,7 +61,7 @@ export default {
   },
   methods: {
     changePsd() {
-      const { email, password, checkPsd, captcha } = this;
+      let { email, password, checkPsd, captcha, validator } = this;
       const regEmail = /^[A-Za-zd]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/;
       if (email === '') {
         this.emailErrTip = '请输入邮箱'
@@ -99,7 +100,61 @@ export default {
           this.captchaErrTip = '';   
         }, 2000)
       }
+      // 校验验证码是否一致
+      this.checkCaptcha();
+      if (email && password && checkPsd && captcha && password === checkPsd) {
+        validator = true
+      }
+      const params = this.$qs.stringify({
+        email,
+        password,
+        captcha
+      })
+      if (validator) {
+        this.$axios.patch('/userinfo/password', params).then((res) => {
+          if (res.data.success === true) {
+            this.$message({
+              message: '修改密码成功，请激活邮件完成密码的修改',
+              type: 'success'
+            });
+          } else {
+            this.$message({
+              message: `${res.data.msg}`,
+              type: 'error'
+            });
+          }
+        }).catch((err) => {
+
+        })
+      }
     },
+    checkCaptcha() {
+      const { captcha } = this;
+      const params = {
+        captcha
+      }
+      if (captcha) {
+        this.$axios.get('/userinfo/checkCaptcha', { params }).then((res) => {
+          if (res.data.success === false) {
+            this.validator = false;
+            this.captchaErrTip = '验证码错误，请重新输入'
+            this.timer = setTimeout(() => {
+              this.captchaErrTip = '';
+            }, 2000)
+          } 
+          if (res.data.success === true) {
+            this.captchaErrTip = '验证码正确';
+            this.timer = setTimeout(() => {
+              this.captchaErrTip = '';
+            }, 2000)
+            this.validator = true;
+          }
+        })
+      }
+    },
+    getCaptcha() {
+      this.$refs.captcha.src = `/userinfo/captcha?time=${Date.now()}`;
+    }
   },
   components: {
     Footer,
@@ -176,9 +231,10 @@ export default {
         text-align left    
     .captcha-box
       .el-input
-        width 240px
+        width 260px
         float left
       img 
+        cursor pointer
         height 40px
         float right
   button
