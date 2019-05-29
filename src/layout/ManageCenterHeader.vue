@@ -75,7 +75,7 @@ export default {
       min-width 400px
     .right-box
       flex 1
-      min-width 200px 
+      min-width 202px 
       float right
       display flex
       justify-content flex-end 

@@ -19,13 +19,16 @@ export default{
     })
   },
 
-  userInfo({ commit }, username) {
-    commit(USER_INFO, { username });
+  userInfo({ commit }, userInfo) {
+    commit(USER_INFO, { userInfo });
   },
 
   getUserInfo({ commit }) {
-    const username = Cookies.get('username')
-    commit(USER_INFO, { username });
+    const user = Cookies.get('username');
+    const userInfo = {
+      user,
+    }
+    commit(USER_INFO, { userInfo });
   },
 
   removeUserInfo({ commit }, router) {
@@ -36,6 +39,7 @@ export default{
           type: 'success'
         });
         Cookies.remove('username')
+        // Cookies.remove('companyId')
         commit(REMOVE_USER_INFO)
         router.replace('/login');
       }  

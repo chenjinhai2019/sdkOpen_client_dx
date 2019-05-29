@@ -1,4 +1,4 @@
 export default{
   bannerImgs: [],
-  username: ''
+  username: '',
 }

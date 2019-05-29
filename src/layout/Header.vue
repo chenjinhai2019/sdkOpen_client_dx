@@ -36,10 +36,10 @@
           </el-dropdown>
         </el-row>
         <el-row type="flex" justify="end" style="min-width:500px">
-          <el-menu :default-active="$route.path" active-text-color="#1890ff" mode="horizontal" :router="true" class="nav">
+          <el-menu :default-active="activeMenu" active-text-color="#1890ff" mode="horizontal" :router="true" class="nav">
             <el-menu-item index="/home">首页</el-menu-item>
             <el-menu-item index="/developDoc">开发文档</el-menu-item>
-            <el-menu-item index="/manageCenter">管理中心</el-menu-item>
+            <el-menu-item :index="dynamicRouter">管理中心</el-menu-item>
           </el-menu>
         </el-row>
       </el-col>
@@ -50,18 +50,51 @@
 import { mapState } from 'vuex'
 
 export default {
+  data() {
+    return {
+
+    }
+  },
   computed: {
     ...mapState({
       username: state => state.username
     }),
+    dynamicRouter() {
+      let certifyState = this.$cookies.get('certifyState')
+      if (this.username) { // 已登录
+        if (certifyState === '-1') {
+          return '/corporateCertify'
+        } else if (certifyState === '1') {
+          return '/manageCenter'
+        }
+      } else {
+        return '/manageCenter'
+      } 
+    },
+    activeMenu() {
+      const route = this.$route;
+      const { meta, path } = route;
+      if (meta.activeMenu) {
+        return meta.activeMenu
+      }
+      return path;
+    },
+  },
+  mounted() {
+    this.checkCertify()
   },
   methods: {
     logout() {
       this.$store.dispatch('removeUserInfo', this.$router);
-    }
-  },
-  data() {
-    return {
+    },
+    checkCertify() {
+      if (this.username) {
+        this.$axios.get('/userinfo/company').then((res) => {
+          console.log(res.data);
+          const rs = res.data;
+          this.$cookies.set('certifyState', `${rs.data.state}`)
+        });
+      }
     }
   },
 }

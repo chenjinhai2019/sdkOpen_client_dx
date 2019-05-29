@@ -7,6 +7,14 @@ const router = new Router({
   routes: [
     { path: '/', redirect: '/home' },
     { path: '/home', component: resolve => require(['views/Home/Home'], resolve) },
+    { // 企业认证
+      path: '/corporateCertify',
+      name: 'corporateCertify',
+      component: resolve => require(['views/CorporateCertify/CorporateCertify.vue'], resolve),
+      meta: {
+        activeMenu: '/manageCenter'
+      }
+    },
     {
       path: '/login',
       name: 'login',

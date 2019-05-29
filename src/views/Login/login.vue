@@ -29,6 +29,7 @@
 <script>
 import Footer from 'layout/Footer'
 import Cookies from 'js-cookie'
+import { mapState } from 'vuex'
 
 export default {
   name: '',
@@ -38,6 +39,11 @@ export default {
       password: '',
     }
   },
+  computed: {
+    ...mapState({
+      userInfo: state => state.userInfo
+    }),
+  },
   methods: {
     login() {
       const { username, password } = this;
@@ -46,22 +52,33 @@ export default {
         password
       }
       this.$axios.get('/userinfo', { params }).then((res) => {
-        if (res.data.success === true) {
+        const rs = res.data;
+        if (rs.success === true) {
           this.$message({
             message: '登录成功',
             type: 'success'
           });
-          console.log(res.data);
-          const user = res.data.data.username;
-          this.$store.dispatch('userInfo', user);
-          Cookies.set('username', username);
+          console.log(rs.data);
+          const user = rs.data.username;
+          const userInfo = {
+            user,
+          }
+          this.$store.dispatch('userInfo', userInfo);
+          Cookies.set('username', user);
 
           // 判断是否需要跳回到路由拦截的页面
           let oldPath = this.$route.query.redirect;
-          if (oldPath) {
+          const certifyState = Cookies.get('certifyState')
+          if (oldPath && certifyState !== '-1') {
             this.timer = setTimeout(() => {
               this.$router.push({
                 path: `${oldPath}`
+              })
+            }, 500);
+          } else if (oldPath && certifyState === '-1') {
+            this.timer = setTimeout(() => {
+              this.$router.push({
+                path: '/corporateCertify'
               })
             }, 500);
           } else {
