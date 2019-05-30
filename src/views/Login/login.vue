@@ -10,7 +10,7 @@
           <el-input placeholder="密码" v-model="password" show-password></el-input>
         </el-row>
         <el-row>
-          <el-button type="primary" size="medium" class="login-btn" @click="login">登录</el-button>
+          <el-button type="primary" size="medium" class="login-btn" v-loading.fullscreen.lock="fullscreenLoading" @click="login">登录</el-button>
         </el-row>
         <el-row type="flex" justify="space-between" class="link-wrapper">
           <el-col>
@@ -37,16 +37,25 @@ export default {
     return {
       username: '',
       password: '',
+      fullscreenLoading: false,
     }
   },
   computed: {
     ...mapState({
-      userInfo: state => state.userInfo
+      
     }),
+  },
+  mounted() {
+
   },
   methods: {
     login() {
+      // 登录
       const { username, password } = this;
+      if (!username || !password) {
+        return false;
+      }
+      this.fullscreenLoading = true;
       const params = {
         account: username,
         password
@@ -65,29 +74,12 @@ export default {
           }
           this.$store.dispatch('userInfo', userInfo);
           Cookies.set('username', user);
-
-          // 判断是否需要跳回到路由拦截的页面
-          let oldPath = this.$route.query.redirect;
-          const certifyState = Cookies.get('certifyState')
-          if (oldPath && certifyState !== '-1') {
-            this.timer = setTimeout(() => {
-              this.$router.push({
-                path: `${oldPath}`
-              })
-            }, 500);
-          } else if (oldPath && certifyState === '-1') {
-            this.timer = setTimeout(() => {
-              this.$router.push({
-                path: '/corporateCertify'
-              })
-            }, 500);
-          } else {
-            this.timer = setTimeout(() => {
-              this.$router.push({
-                path: '/home'
-              })
-            }, 500);
-          }
+          // 登录后跳转到首页
+          this.timer = setTimeout(() => {
+            this.$router.push({
+              path: '/home'
+            })
+          }, 500);
         } else {
           this.$message({
             message: `${res.data.msg}`,
@@ -95,7 +87,7 @@ export default {
           });
         }
       })
-    }
+    },
   },
   components: {
     Footer,

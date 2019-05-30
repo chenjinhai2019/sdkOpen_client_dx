@@ -2,6 +2,7 @@ import {
   RECEIVE_BANNERIMGS,
   USER_INFO,
   REMOVE_USER_INFO,
+  CERTIFY_STATE
 } from './mutation-types'
 
 export default{
@@ -16,4 +17,8 @@ export default{
   [REMOVE_USER_INFO](state) {
     state.username = ''
   },
+
+  [CERTIFY_STATE](state, { certifyState }) {
+    state.certifyState = certifyState;
+  }
 }

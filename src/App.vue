@@ -10,8 +10,16 @@ import Header from 'layout/Header'
 
 export default {
   name: 'App',
+  computed: {
+    username() {
+      return this.$store.state.username;
+    }
+  },
   mounted() {
     this.$store.dispatch('getUserInfo');
+  },
+  methods: {
+    
   },
   components: {
     Header,

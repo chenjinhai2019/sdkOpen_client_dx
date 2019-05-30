@@ -39,7 +39,6 @@ export default{
           type: 'success'
         });
         Cookies.remove('username')
-        // Cookies.remove('companyId')
         commit(REMOVE_USER_INFO)
         router.replace('/login');
       }  

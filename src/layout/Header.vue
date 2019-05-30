@@ -39,7 +39,7 @@
           <el-menu :default-active="activeMenu" active-text-color="#1890ff" mode="horizontal" :router="true" class="nav">
             <el-menu-item index="/home">首页</el-menu-item>
             <el-menu-item index="/developDoc">开发文档</el-menu-item>
-            <el-menu-item :index="dynamicRouter">管理中心</el-menu-item>
+            <el-menu-item v-show="!$route.meta.hideTab" @click="checkCertify">管理中心</el-menu-item>
           </el-menu>
         </el-row>
       </el-col>
@@ -52,25 +52,13 @@ import { mapState } from 'vuex'
 export default {
   data() {
     return {
-
+      dynamicRouter: ''
     }
   },
   computed: {
     ...mapState({
       username: state => state.username
     }),
-    dynamicRouter() {
-      let certifyState = this.$cookies.get('certifyState')
-      if (this.username) { // 已登录
-        if (certifyState === '-1') {
-          return '/corporateCertify'
-        } else if (certifyState === '1') {
-          return '/manageCenter'
-        }
-      } else {
-        return '/manageCenter'
-      } 
-    },
     activeMenu() {
       const route = this.$route;
       const { meta, path } = route;
@@ -81,7 +69,7 @@ export default {
     },
   },
   mounted() {
-    this.checkCertify()
+    
   },
   methods: {
     logout() {
@@ -90,10 +78,29 @@ export default {
     checkCertify() {
       if (this.username) {
         this.$axios.get('/userinfo/company').then((res) => {
-          console.log(res.data);
           const rs = res.data;
-          this.$cookies.set('certifyState', `${rs.data.state}`)
+          let certifyState = rs.data.state;
+
+          // 存vuex
+          this.$store.commit('certify_state', { certifyState })
+          // console.log(certifyState);
+          if (certifyState === -1) {
+            this.$router.push('/corporateCertify')
+          } else if (certifyState === 0) {
+            this.$msgbox({
+              title: '提示',
+              message: '您的企业认证信息还在审核中，审核结果会通过邮件告知，请留意您的邮箱。',
+              type: 'success',
+              showClose: false,
+              confirmButtonText: '确定',
+              closeOnClickModal: false,
+            })
+          } else if (certifyState === 1) {
+            this.$router.push('/manageCenter');
+          }
         });
+      } else {
+        this.$router.push('/manageCenter')
       }
     }
   },
