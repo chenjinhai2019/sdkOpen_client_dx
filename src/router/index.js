@@ -15,6 +15,7 @@ const router = new Router({
         activeMenu: '/manageCenter'
       }
     },
+    // 登录
     {
       path: '/login',
       name: 'login',
@@ -41,11 +42,13 @@ const router = new Router({
         hideTab: true,
       },
     },
+    // 开发文档
     {
       path: '/developDoc',
       name: 'developDoc',
       component: resolve => require(['views/DevelopDoc/DevelopDoc.vue'], resolve),
     },
+    // 管理中心
     { path: '/manageCenter', redirect: '/manageCenter/applicationManage' },
     {
       path: '/manageCenter',
@@ -101,6 +104,12 @@ const router = new Router({
           }
         },
       ],
+    },
+    // 子账号管理
+    {
+      path: '/subaccountManage',
+      name: 'subaccountManage',
+      component: resolve => require(['views/SubaccountManage/SubaccountManage'], resolve),
     },
   ],
   linkActiveClass: 'active'

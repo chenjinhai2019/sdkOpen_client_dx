@@ -20,7 +20,7 @@
               <i class="el-icon-caret-bottom"/>
             </div>
             <el-dropdown-menu slot="dropdown">
-              <router-link to="">
+              <router-link to="/subaccountManage">
                 <el-dropdown-item>管理</el-dropdown-item>
               </router-link>
               <router-link to="">

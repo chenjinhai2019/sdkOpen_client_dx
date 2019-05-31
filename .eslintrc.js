@@ -61,6 +61,7 @@ module.exports = {
     'consistent-return':0,
     'prefer-const': 0,
     'no-param-reassign': 0,
-    'no-else-return': 0
+    'no-else-return': 0,
+    'dot-notation': 0
   }
 }

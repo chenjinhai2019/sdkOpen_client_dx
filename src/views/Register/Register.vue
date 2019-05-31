@@ -159,12 +159,13 @@ export default {
               password = '';
               checkPsd = '';
               captcha = '';
-              /* this.timer = setTimeout(() => {
+              this.timer = setTimeout(() => {
                 this.$router.push({
                   path: '/login'
                 })
-              }, 500) */
+              }, 500)
             } else {
+              this.getCaptcha();
               this.$message({
                 message: `${res.data.msg}`,
                 type: 'error'

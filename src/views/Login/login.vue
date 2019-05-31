@@ -63,11 +63,12 @@ export default {
       this.$axios.get('/userinfo', { params }).then((res) => {
         const rs = res.data;
         if (rs.success === true) {
+          this.fullscreenLoading = false;
           this.$message({
             message: '登录成功',
             type: 'success'
           });
-          console.log(rs.data);
+          // console.log(rs.data);
           const user = rs.data.username;
           const userInfo = {
             user,
@@ -81,6 +82,7 @@ export default {
             })
           }, 500);
         } else {
+          this.fullscreenLoading = false;
           this.$message({
             message: `${res.data.msg}`,
             type: 'error'
