@@ -105,11 +105,17 @@ const router = new Router({
         },
       ],
     },
+    // 账号管理
+    {
+      path: '/accountManage',
+      name: 'accountManage',
+      component: resolve => require(['views/AccountManage/AccountManageHeader'], resolve),
+    },
     // 子账号管理
     {
       path: '/subaccountManage',
       name: 'subaccountManage',
-      component: resolve => require(['views/SubaccountManage/SubaccountManage'], resolve),
+      component: resolve => require(['views/AccountManage/SubaccountManage'], resolve),
     },
   ],
   linkActiveClass: 'active'

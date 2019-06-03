@@ -39,7 +39,7 @@
           <el-menu :default-active="activeMenu" active-text-color="#1890ff" mode="horizontal" :router="true" class="nav">
             <el-menu-item index="/home">首页</el-menu-item>
             <el-menu-item index="/developDoc">开发文档</el-menu-item>
-            <el-menu-item v-show="!$route.meta.hideTab" @click="checkCertify">管理中心</el-menu-item>
+            <el-menu-item :style="styleObj" v-show="!$route.meta.hideTab" @click="checkCertify">管理中心</el-menu-item>
           </el-menu>
         </el-row>
       </el-col>
@@ -52,7 +52,7 @@ import { mapState } from 'vuex'
 export default {
   data() {
     return {
-      dynamicRouter: ''
+      dynamicRouter: '',
     }
   },
   computed: {
@@ -66,6 +66,14 @@ export default {
         return meta.activeMenu
       }
       return path;
+    },
+    // 当返回路由不为 '/manageCenter' 时，去除管理中心menu高亮显示
+    styleObj() {
+      if (this.activeMenu !== '/manageCenter') {
+        return 'border-bottom-color:transparent;color:#909399' 
+      } else {
+        return ''
+      }
     },
   },
   mounted() {

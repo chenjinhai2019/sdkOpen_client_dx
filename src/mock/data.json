@@ -8,5 +8,143 @@
       "title":"图片2",
       "src":"static/images/banner2.jpg"
     }
-  ]
+  ],
+  "subSccountTableData": {
+    "pageNum": 1,
+    "pageSize": 2,
+    "size": 2,
+    "startRow": 1,
+    "endRow": 2,
+    "total": 3,
+    "pages": 2,
+    "list": [{
+      "parentId": 1,
+      "childId": 4,
+      "confirm": false,
+      "createTime": "2019-05-30 15:59:06",
+      "username": "ABCD2",
+      "email": "wangzhe2@jingxunsoft.com",
+      "permission": 4096,
+      "binaryPermission": "0001000000000000",
+      "permissionList": [{
+        "permissionBit": 1,
+        "has": false,
+        "permissionName": "申请公版OEM"
+      }, {
+        "permissionBit": 2,
+        "has": false,
+        "permissionName": "查看公版OEM配置"
+      }, {
+        "permissionBit": 3,
+        "has": false,
+        "permissionName": "申请SDK"
+      }, {
+        "permissionBit": 4,
+        "has": false,
+        "permissionName": "查看SDK配置"
+      }, {
+        "permissionBit": 5,
+        "has": false,
+        "permissionName": "添加普通产品"
+      }, {
+        "permissionBit": 6,
+        "has": false,
+        "permissionName": "删除普通产品"
+      }, {
+        "permissionBit": 7,
+        "has": false,
+        "permissionName": "修改普通产品配置"
+      }, {
+        "permissionBit": 8,
+        "has": false,
+        "permissionName": "查看普通产品配置"
+      }, {
+        "permissionBit": 9,
+        "has": false,
+        "permissionName": "添加天猫配件"
+      }, {
+        "permissionBit": 10,
+        "has": false,
+        "permissionName": "删除天猫配件"
+      }, {
+        "permissionBit": 11,
+        "has": false,
+        "permissionName": "修改天猫配件配置"
+      }, {
+        "permissionBit": 12,
+        "has": false,
+        "permissionName": "查看天猫配件配置"
+      }]
+    }, {
+      "parentId": 1,
+      "childId": 6,
+      "confirm": true,
+      "createTime": "2019-05-31 11:36:32",
+      "username": "ABCD4",
+      "email": "934727983@qq.com",
+      "permission": 2186,
+      "binaryPermission": "0000100010001010",
+      "permissionList": [{
+        "permissionBit": 1,
+        "has": false,
+        "permissionName": "申请公版OEM"
+      }, {
+        "permissionBit": 2,
+        "has": true,
+        "permissionName": "查看公版OEM配置"
+      }, {
+        "permissionBit": 3,
+        "has": false,
+        "permissionName": "申请SDK"
+      }, {
+        "permissionBit": 4,
+        "has": true,
+        "permissionName": "查看SDK配置"
+      }, {
+        "permissionBit": 5,
+        "has": false,
+        "permissionName": "添加普通产品"
+      }, {
+        "permissionBit": 6,
+        "has": false,
+        "permissionName": "删除普通产品"
+      }, {
+        "permissionBit": 7,
+        "has": false,
+        "permissionName": "修改普通产品配置"
+      }, {
+        "permissionBit": 8,
+        "has": true,
+        "permissionName": "查看普通产品配置"
+      }, {
+        "permissionBit": 9,
+        "has": false,
+        "permissionName": "添加天猫配件"
+      }, {
+        "permissionBit": 10,
+        "has": false,
+        "permissionName": "删除天猫配件"
+      }, {
+        "permissionBit": 11,
+        "has": false,
+        "permissionName": "修改天猫配件配置"
+      }, {
+        "permissionBit": 12,
+        "has": true,
+        "permissionName": "查看天猫配件配置"
+      }]
+    }],
+    "prePage": 0,
+    "nextPage": 2,
+    "isFirstPage": true,
+    "isLastPage": false,
+    "hasPreviousPage": false,
+    "hasNextPage": true,
+    "navigatePages": 8,
+    "navigatepageNums": [1, 2],
+    "navigateFirstPage": 1,
+    "navigateLastPage": 2,
+    "lastPage": 2,
+    "firstPage": 1
+  }
 }
