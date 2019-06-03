@@ -152,8 +152,8 @@ export default {
         if (rs.success === true) {
           this.$message.success('修改权限成功！')
         } else {
-          /* const nowItem = scope.row.permissionList[permissionBit - 1];
-          nowItem.has = !nowItem.has */
+          const nowItem = scope.row.permissionList[permissionBit - 1];
+          nowItem.has = !nowItem.has
           this.$message.error(`${rs.msg}`)
         }
       })
