@@ -88,6 +88,9 @@ export default {
             type: 'error'
           });
         }
+      }).catch((error) => {
+        this.$message.error(`${error}`)
+        this.fullscreenLoading = false;
       })
     },
   },
