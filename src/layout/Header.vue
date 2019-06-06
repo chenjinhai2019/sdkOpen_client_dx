@@ -14,10 +14,10 @@
             <router-link to="/login" class="login" v-show="!$route.meta.hideLogin">登录</router-link>
             <router-link to="/register" class="register" v-show="!$route.meta.hideRegister">注册</router-link>
           </div>
-          <el-dropdown class="welcome-container" trigger="click" v-else>
+          <el-dropdown class="welcome-container" trigger="hover" v-else>
             <div class="welcome-wrap">
               <div class="welcome">hello,{{username}}</div>
-              <i class="el-icon-caret-bottom"/>
+              <!-- <i class="el-icon-caret-bottom"/> -->
             </div>
             <el-dropdown-menu slot="dropdown">
               <router-link to="/subaccountManage">
