@@ -117,6 +117,18 @@ const router = new Router({
       name: 'subaccountManage',
       component: resolve => require(['views/AccountManage/SubaccountManage'], resolve),
     },
+    // 操作日志
+    {
+      path: '/operateLog',
+      name: 'operateLog',
+      component: resolve => require(['views/AccountManage/Oplog'], resolve),
+    },
+    // 订阅
+    {
+      path: '/subscribe',
+      name: 'subscribe',
+      component: resolve => require(['views/AccountManage/Subscribe'], resolve),
+    },
   ],
   linkActiveClass: 'active'
 });

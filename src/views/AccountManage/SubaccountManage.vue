@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <el-main>
-      <AccountManageHeader />
+      <AccountManageHeader currentIndex='0' />
       <el-row>
         <el-col :span="10">
           <el-alert
@@ -200,11 +200,13 @@ export default {
             item.authority[i].name = nameArr[i];
           }
         }) */
-        console.log(tableData)
+        // console.log(tableData)
+      }).catch((error) => {
+        this.$message.error(`${error}`)
+        this.loading = false;
       })
     },
     handleCurrentChange(val) {
-      // console.log(`当前页: ${val}`);
       this.initTeamTable(val);
     },
     addSubaccount(formName) {
