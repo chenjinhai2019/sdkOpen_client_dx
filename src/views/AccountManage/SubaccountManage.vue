@@ -125,8 +125,8 @@ export default {
       },
       rules: {
         username: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 5, message: '长度至少为 5 个字符', trigger: 'blur' }
+          { required: true, message: '请输入子账号用户名', trigger: 'blur' },
+          /* { min: 5, message: '长度至少为 5 个字符', trigger: 'blur' } */
         ],
         email: [
           { required: true, message: '请输入邮箱地址', trigger: 'blur' },
@@ -152,8 +152,8 @@ export default {
         if (rs.success === true) {
           this.$message.success('修改权限成功！')
         } else {
-          /* const nowItem = scope.row.permissionList[permissionBit - 1];
-          nowItem.has = !nowItem.has */
+          const nowItem = scope.row.permissionList[permissionBit - 1];
+          nowItem.has = !nowItem.has
           this.$message.error(`${rs.msg}`)
         }
       })
@@ -276,6 +276,7 @@ export default {
      font-size 28px
      text-align left 
   .table 
+    text-align center
     .el-table 
       margin-bottom 30px  
 </style>

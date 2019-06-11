@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <el-container v-if="showContainer">
+    <el-container v-if="showContainer" class="wrapper">
       <el-header>
         <h1>选择APP创建方式</h1>
       </el-header>
@@ -46,6 +46,7 @@ export default {
 
 <style lang="stylus" scoped>
 .el-container
+  text-align center
   width 1200px
   margin 0 auto
   .el-header

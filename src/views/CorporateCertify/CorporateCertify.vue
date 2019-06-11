@@ -24,9 +24,9 @@
       </el-form-item>
       <el-form-item class="captcha" label="验证码：" prop="code">
         <el-input v-model="form.code" @blur="checkCode"></el-input>
-        <el-button type="primary" @click="getCode">{{computedTime>0?`已发送(${computedTime})s`:'获取验证码'}}</el-button>
+        <el-button style="margin-left: 15px;" type="primary" @click="getCode">{{computedTime>0?`已发送(${computedTime})s`:'获取验证码'}}</el-button>
       </el-form-item>
-      <el-form-item label="企业证件：">
+      <el-form-item label="企业证件：" >
         <el-upload
           action="/upload"
           list-type="picture-card"
@@ -41,7 +41,7 @@
           <img width="100%" :src="dialogImageUrl" alt="">
         </el-dialog>
       </el-form-item>
-      <el-form-item class="" label-width="0">
+      <el-form-item class="check-box" label-width="0">
         <el-checkbox v-model="isChecked" style="margin-right:0;">我已阅读</el-checkbox> 深圳市晶讯软件有限公司 <a @click.prevent="">隐私声明</a>
       </el-form-item>
       <el-form-item class="btn" label-width="0">
@@ -194,6 +194,8 @@ export default {
   .el-form
     width 600px
     margin 50px auto 0
+    .check-box
+      text-align center
     .el-input 
       width 100%
       float left
@@ -203,6 +205,7 @@ export default {
       .el-button
         width 110px  
   .btn
+    text-align center
     .el-button
       width 80% 
       margin 20px auto 0

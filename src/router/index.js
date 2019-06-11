@@ -21,7 +21,7 @@ const router = new Router({
       name: 'login',
       component: resolve => require(['views/Login/Login.vue'], resolve),
       meta: {
-        hideTab: true,
+        hideManageCenterMenu: true,
         hideLogin: true,
       },
     },
@@ -30,7 +30,7 @@ const router = new Router({
       name: 'register',
       component: resolve => require(['views/Register/Register.vue'], resolve),
       meta: {
-        hideTab: true,
+        hideManageCenterMenu: true,
         hideRegister: true,
       },
     },
@@ -39,7 +39,7 @@ const router = new Router({
       name: 'forgetPsd',
       component: resolve => require(['views/ForgetPsd/ForgetPsd.vue'], resolve),
       meta: {
-        hideTab: true,
+        hideManageCenterMenu: true,
       },
     },
     // 开发文档

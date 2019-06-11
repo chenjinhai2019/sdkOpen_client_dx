@@ -100,7 +100,7 @@ export default {
       selectValue: '',
       options: [],
       pickerOptions: {
-        /* shortcuts: [{
+        shortcuts: [{
           text: '最近一周',
           onClick(picker) {
             const end = new Date();
@@ -124,7 +124,7 @@ export default {
             start.setTime(start.getTime() - (3600 * 1000 * 24 * 90));
             picker.$emit('pick', [start, end]);
           }
-        }] */
+        }]
       },
       tableData: []
     }

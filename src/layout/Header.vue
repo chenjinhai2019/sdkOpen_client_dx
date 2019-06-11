@@ -23,10 +23,10 @@
               <router-link to="/subaccountManage">
                 <el-dropdown-item>管理</el-dropdown-item>
               </router-link>
-              <router-link to="">
+              <router-link to="/operateLog">
                 <el-dropdown-item>日志</el-dropdown-item>
               </router-link>
-              <router-link to="">
+              <router-link to="/subscribe">
                 <el-dropdown-item>订阅</el-dropdown-item>
               </router-link>
               <el-dropdown-item divided>
@@ -39,7 +39,7 @@
           <el-menu :default-active="activeMenu" active-text-color="#1890ff" mode="horizontal" :router="true" class="nav">
             <el-menu-item index="/home">首页</el-menu-item>
             <el-menu-item index="/developDoc">开发文档</el-menu-item>
-            <el-menu-item :style="styleObj" v-show="!$route.meta.hideTab" @click="checkCertify">管理中心</el-menu-item>
+            <el-menu-item :style="styleObj" v-show="!$route.meta.hideManageCenterMenu" @click="checkCertify">管理中心</el-menu-item>
           </el-menu>
         </el-row>
       </el-col>
