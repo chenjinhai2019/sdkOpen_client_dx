@@ -2,7 +2,9 @@ import {
   RECEIVE_BANNERIMGS,
   USER_INFO,
   REMOVE_USER_INFO,
-  CERTIFY_STATE
+  CERTIFY_STATE,
+  CHECK_OEMAPPLICATION,
+  GET_LOGO
 } from './mutation-types'
 
 export default{
@@ -20,5 +22,16 @@ export default{
 
   [CERTIFY_STATE](state, { certifyState }) {
     state.certifyState = certifyState;
+  },
+
+  [CHECK_OEMAPPLICATION](state, { oemApplication }) {
+    state.oemApplication = oemApplication
+    state.originAppName = oemApplication.appName
+    state.originAppPackName = oemApplication.appPackName
+    state.originAppVersion = oemApplication.appVersion
+  },
+
+  [GET_LOGO](state, { logo }) {
+    state.logo = logo;
   }
 }

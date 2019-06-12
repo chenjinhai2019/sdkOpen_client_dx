@@ -32,6 +32,7 @@ export default {
     }
   },
   computed: {
+    // 当路由不是应用管理页面，隐藏应用管理页面的内容，改为显示子路由内容
     showContainer() {
       const route = this.$route;
       const { path } = route;

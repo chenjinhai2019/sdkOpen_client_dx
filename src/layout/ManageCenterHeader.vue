@@ -60,6 +60,7 @@ export default {
   border-bottom none
   border-bottom-color transparent!important
 .wrapper
+  min-width 1200px
   height 60px
   box-shadow 1px 1px 5px #999
   .el-row

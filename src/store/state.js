@@ -1,5 +1,10 @@
 export default{
   bannerImgs: [],
   username: '',
-  certifyState: ''
+  certifyState: '',
+  oemApplication: {},
+  originAppName: '',
+  originAppPackName: '',
+  originAppVersion: '',
+  logo: '',
 }

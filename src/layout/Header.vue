@@ -134,8 +134,10 @@ export default {
         .login, .register
           font-size 14px
           /*text-decoration underline*/
-          color blue
+          color #666
           vertical-align middle
+          &:hover  
+            color #333
         .register
           margin-left 10px
           vertical-align middle

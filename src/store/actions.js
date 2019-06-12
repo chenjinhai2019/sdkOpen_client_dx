@@ -4,7 +4,9 @@ import { Message } from 'element-ui';
 import {
   RECEIVE_BANNERIMGS,
   USER_INFO,
-  REMOVE_USER_INFO
+  REMOVE_USER_INFO,
+  CHECK_OEMAPPLICATION,
+  GET_LOGO
 } from './mutation-types';
 
 export default{
@@ -42,6 +44,27 @@ export default{
         commit(REMOVE_USER_INFO)
         router.replace('/login');
       }  
+    })
+  },
+
+  // 检查账号是否拥有OEM应用
+  checkOemApplication({ commit }) {
+    axios.get('/userinfo/checkOemApplication').then((res) => {
+      if (res.data.success === true) {
+        const oemApplication = res.data.data.oemApplication;
+        console.log(oemApplication);
+        commit(CHECK_OEMAPPLICATION, { oemApplication });
+      }
+    })
+  },
+
+  // 获取logo
+  getLogo({ commit }) {
+    axios.get('/oemApplication/ui/logo').then((res) => {
+      if (res.data.success === true) {
+        const logo = res.data.data.logo;
+        commit(GET_LOGO, { logo });
+      }
     })
   }
 }
