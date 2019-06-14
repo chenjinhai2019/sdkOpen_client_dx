@@ -43,8 +43,9 @@ export default{
 
   // 保存当前的步骤
   stepNow(state, { active, active1 }) {
-    state.active = active;
+    /* state.active = active;
     state.active1 = active1;
+     */
   },
 
   [GET_INTRODUCE_IMG](state, { introduceImgs, useIntroduceImg }) {

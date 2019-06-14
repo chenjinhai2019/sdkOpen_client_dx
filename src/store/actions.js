@@ -54,7 +54,7 @@ export default{
     axios.get('/userinfo/checkOemApplication').then((res) => {
       if (res.data.success === true) {
         const oemApplication = res.data.data.oemApplication;
-        console.log(oemApplication);
+        // console.log(oemApplication);
         commit(CHECK_OEMAPPLICATION, { oemApplication });
       }
     })

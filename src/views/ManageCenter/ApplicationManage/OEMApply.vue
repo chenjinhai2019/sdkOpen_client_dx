@@ -169,7 +169,24 @@
             </el-row>
           </div>
           <div class="step1-3" v-show="active1===4">
-            第四步
+            <!-- 第四步 产品图片配置 -->
+            <el-row class="app-config" :gutter="50" type="flex">
+              <el-col class="img-box">
+                <div class="phone-box">
+                  <img class="phone" src="./imgs/phone.jpg" alt="">
+                  <img class="" alt="">
+                </div>
+              </el-col>
+              <el-col class="cont">
+                <div>
+                  <!-- yyyy -->
+                </div>
+                <p>自定义图片要求：</p>
+                <p>分辨率：200*200</p>
+                <p>格式：.png</p>
+                <p>文件大小： 小于5M</p>
+              </el-col>
+            </el-row>
           </div>
           <div class="step1-3" v-show="active1===5">
             第五步
@@ -208,9 +225,9 @@ import Swiper from 'swiper/dist/js/swiper'
 export default {
   name: '',
   data() { 
-    return {
+    return {/* 
       active: 0,
-      active1: 0,
+      active1: 0, */
       STEPNUM_1: 6,
       introduceImg1: '',
       introduceImg2: '',
@@ -222,6 +239,23 @@ export default {
     /* 如果是第一步时，显示‘返回’ ，其他步骤时都显示‘上一步’ */
     prevText() {
       return this.active === 0 ? '返回' : '上一步';
+    },
+    // 保存当前的步骤
+    active: {
+      get() {
+        return this.$store.state.active
+      },
+      set(val) {
+        this.$store.state.active = val
+      }
+    },
+    active1: {
+      get() {
+        return this.$store.state.active1
+      },
+      set(val) {
+        this.$store.state.active1 = val
+      }
     },
     // 获取OEM应用对象，没有时为null
     ...mapState(['oemApplication', 'originAppName', 'originAppPackName', 'originAppVersion', 'logo', 'startImg', 'introduceImgs']), 
@@ -279,10 +313,19 @@ export default {
       }
     },
   },
+  created() {
+    this.getLogo()
+    this.getStartImg()
+    this.getIntroduceImg();
+    this.getproductImg();
+  },
   mounted() {
     this.$store.dispatch('checkOemApplication');
   },
   methods: {
+    aaa(scope) {
+      console.log(scope);
+    },
     // 创建app的应用名，包名和版本号
     createApplication() {
       const { oemApplication, appName, appPackName, appVersion } = this;
@@ -373,7 +416,7 @@ export default {
       this.introduceImg3 = response.data
     },
     introduceImgUpload() {
-      debugger;
+      // debugger;
       let { introduceImg1, introduceImg2, introduceImg3 } = this;
       if (!introduceImg1) {
         this.introduceImg1 = this.introduceImgs[0];
@@ -401,6 +444,21 @@ export default {
       })
     }, 
 
+    // 获取产品图片
+    getproductImg() {
+      this.$axios.get('/oemApplication/ui/productImg').then((res) => {
+        const rs = res.data;
+        console.log(rs);
+        this.productTableData = rs.data;
+        console.log(this.productTableData);
+      })
+    },
+    // 产品图片上传
+    productIconUpload(response, file, fileList) {
+      this.productOpenImg = response.data
+      // console.log(this.productOpenImg);
+    },
+
     next() {
       const { STEPNUM_1, oemApplication } = this;
       
@@ -421,7 +479,7 @@ export default {
       // 第一步 this.active = 1，如果没有id，则创建app; 如果有id，则直接进入下一步
       if (!oemApplication.id) { // 没有创建app
         if (this.active === 1) {
-          console.log(111);
+          // console.log(111);
         }
         /* if (this.active === 2 && this.active1 === 0) {
           console.log(2222);
@@ -439,26 +497,35 @@ export default {
         if (this.active === 1 && this.active1 === 3) {
           this.getIntroduceImg();
         } 
+        // 获取产品图片
+        if (this.active === 1 && this.active1 === 4) {
+          this.getproductImg();
+        }
       }
 
       // 保存当前的步骤
+      this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
       // this.$store.commit('stepNow', { active: this.active, active1: this.active1 });
     },
     prev() {
       if (this.active !== 1 && this.active !== 0) {
         this.active--
       }
+      if (this.active === 0) {
+        this.$router.push('/manageCenter/applicationManage')
+      }
       if (this.active === 1) {
         this.active1--
         if (this.active1 < 1) {
           this.active = 0;
-          return false;
+          // return false;
         }
-      }
-      if (this.active === 0) {
-        this.$router.push('/manageCenter/applicationManage')
+        console.log(this.active, this.active1);
       }
       // 保存当前的步骤
+      this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
       // this.$store.commit('stepNow', { active: this.active, active1: this.active1 });
     }
   },
@@ -544,6 +611,31 @@ export default {
         .cont 
           font-size 22px
           text-align left
+          .el-table
+            .icon-upload
+              display inline-block
+              width 50px
+              height 50px
+              .avatar-uploader .el-upload 
+                border: 1px dashed #d9d9d9
+                border-radius: 6px
+                cursor: pointer
+                position: relative
+                overflow: hidden
+              .avatar-uploader-icon 
+                font-size: 20px
+                color: #8c939d
+                width: 50px
+                height: 50px
+                line-height: 50px
+                text-align: center
+              .avatar 
+                width: 50px
+                height: 50px
+                display: block
+            img
+              width 50px
+              height 50px
           div 
            margin-bottom 30px   
           p 
