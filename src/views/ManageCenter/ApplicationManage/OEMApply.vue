@@ -179,7 +179,44 @@
               </el-col>
               <el-col class="cont">
                 <div>
-                  <!-- yyyy -->
+                  <!--  -->
+                  产品类型：  
+                  <el-select v-model="selectValue" @change="showProductImg" placeholder="请选择" clearable>
+                    <el-option
+                      v-for="item in options"
+                      :key="item.productTypeId"
+                      :label="item.productTypeName"
+                      :value="item.productTypeId">
+                    </el-option>
+                  </el-select>
+                  <div>
+                    <span class="upload-box" v-if="openImgUrl">
+                      <div class="upload-title">
+                        开
+                      </div>
+                      <el-upload
+                        class="product-upload"
+                        action="/upload"
+                        :show-file-list="false"
+                        :on-success="productOpenImgUpload">
+                        <img v-if="openImgUrl" :src='openImgUrl' class="icon">
+                        <i v-else class="el-icon-plus product-upload-icon"></i>
+                      </el-upload>
+                    </span>
+                    <span class="upload-box" v-if="openImgUrl">
+                      <div class="upload-title">
+                        关
+                      </div>
+                      <el-upload
+                        class="product-upload"
+                        action="/upload"
+                        :show-file-list="false"
+                        :on-success="productCloseImgUpload">
+                        <img v-if="closeImgUrl" :src='closeImgUrl' class="icon">
+                        <i v-else class="el-icon-plus product-upload-icon"></i>
+                      </el-upload>
+                    </span>
+                  </div>
                 </div>
                 <p>自定义图片要求：</p>
                 <p>分辨率：200*200</p>
@@ -229,9 +266,15 @@ export default {
       active: 0,
       active1: 0, */
       STEPNUM_1: 6,
-      introduceImg1: '',
+      introduceImg1: '', // 产品介绍图片
       introduceImg2: '',
       introduceImg3: '',
+      selectValue: '', // select选项值
+      options: [], // select选项数据
+      productData: [], // 产品数据
+      openImgUrl: '', // 产品开启图片的url
+      closeImgUrl: '', // 产品关闭图片的url
+      productTypeId: '', // 产品id
       showPublish: false
     }
   },
@@ -314,18 +357,31 @@ export default {
     },
   },
   created() {
-    this.getLogo()
+    /* this.getLogo()
     this.getStartImg()
     this.getIntroduceImg();
-    this.getproductImg();
+    this.getProductImg(); */
+    // 获取logo
+    if (this.active === 1 && this.active1 === 1) {
+      this.getLogo()
+    }
+    // 获取启动图片
+    if (this.active === 1 && this.active1 === 2) {
+      this.getStartImg()
+    }
+    // 获取介绍图片
+    if (this.active === 1 && this.active1 === 3) {
+      this.getIntroduceImg();
+    } 
+    // 获取产品图片
+    if (this.active === 1 && this.active1 === 4) {
+      this.getProductImg();
+    }
   },
   mounted() {
     this.$store.dispatch('checkOemApplication');
   },
   methods: {
-    aaa(scope) {
-      console.log(scope);
-    },
     // 创建app的应用名，包名和版本号
     createApplication() {
       const { oemApplication, appName, appPackName, appVersion } = this;
@@ -445,20 +501,67 @@ export default {
     }, 
 
     // 获取产品图片
-    getproductImg() {
+    getProductImg() {
       this.$axios.get('/oemApplication/ui/productImg').then((res) => {
         const rs = res.data;
         console.log(rs);
-        this.productTableData = rs.data;
-        console.log(this.productTableData);
+        this.productData = rs.data
+        this.productData.forEach((item, index) => {
+          const obj = {}
+          obj.productTypeName = item.productTypeName;
+          obj.productTypeId = item.productTypeId;
+          this.options.push(obj);
+        })
       })
     },
-    // 产品图片上传
-    productIconUpload(response, file, fileList) {
-      this.productOpenImg = response.data
-      // console.log(this.productOpenImg);
+    showProductImg() {
+      // console.log(this.selectValue);
+      const { selectValue, productData } = this;
+      this.productData.forEach((item) => {
+        if (selectValue === item.productTypeId) {
+          this.openImgUrl = item.openImg ? item.openImg : item.defaultOpenImg;
+          this.closeImgUrl = item.closeImg ? item.closeImg : item.defaultCloseImg;
+          this.productTypeId = item.productTypeId;
+        }
+      })
     },
-
+    // 产品开启图片上传
+    productOpenImgUpload(response, file, fileList) {
+      const openImg = response.data
+      // console.log(openImg);
+      const productTypeId = this.productTypeId;
+      const params = this.$qs.stringify({
+        productTypeId,
+        openImg
+      })
+      this.$axios.patch('/oemApplication/ui/productImg', params).then((res) => {
+        const rs = res.data;
+        if (rs.success === true) {
+          this.$message.success('上传成功')
+        }
+        // 成功后重新渲染产品启动图片
+        this.productImgRender();
+      })
+    },
+    // 产品关闭图片上传
+    productCloseImgUpload(response) {
+      const closeImg = response.data
+      // console.log(this.closeImg);
+      const productTypeId = this.productTypeId;
+      const params = this.$qs.stringify({
+        productTypeId,
+        closeImg
+      })
+      this.$axios.patch('/oemApplication/ui/productImg', params).then((res) => {
+        const rs = res.data;
+        if (rs.success === true) {
+          this.$message.success('上传成功')
+        }
+        // 成功后重新渲染产品关闭图片
+        this.productImgRender();
+      })
+    },
+    
     next() {
       const { STEPNUM_1, oemApplication } = this;
       
@@ -499,7 +602,7 @@ export default {
         } 
         // 获取产品图片
         if (this.active === 1 && this.active1 === 4) {
-          this.getproductImg();
+          this.getProductImg();
         }
       }
 
@@ -611,31 +714,31 @@ export default {
         .cont 
           font-size 22px
           text-align left
-          .el-table
-            .icon-upload
-              display inline-block
-              width 50px
-              height 50px
-              .avatar-uploader .el-upload 
-                border: 1px dashed #d9d9d9
-                border-radius: 6px
-                cursor: pointer
-                position: relative
-                overflow: hidden
-              .avatar-uploader-icon 
-                font-size: 20px
-                color: #8c939d
-                width: 50px
-                height: 50px
-                line-height: 50px
-                text-align: center
-              .avatar 
-                width: 50px
-                height: 50px
-                display: block
-            img
-              width 50px
-              height 50px
+          .upload-box 
+            display flex
+            .upload-title
+              margin-right 20px
+            .product-upload
+              border 1px dashed #d9d9d9
+              border-radius 6px
+              width 120px
+              height 120px
+              cursor pointer
+              position relative
+              overflow hidden
+              &:hover 
+                border-color: #409EFF
+              .product-upload-icon 
+                font-size 28px
+                color #8c939d
+                width 120px
+                height 120px
+                line-height 120px
+                text-align center
+              .icon 
+                width 120px
+                height 120px
+                display block
           div 
            margin-bottom 30px   
           p 

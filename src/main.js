@@ -11,7 +11,7 @@ import cookies from 'js-cookie'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import 'font-awesome/css/font-awesome.min.css'
-import './mock/mockServer'; // 加载mockServer
+import './mock/mockServer'; 
 
 Vue.prototype.$qs = qs;
 Vue.prototype.$axios = axios; 
