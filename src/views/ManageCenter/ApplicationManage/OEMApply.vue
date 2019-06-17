@@ -174,7 +174,14 @@
               <el-col class="img-box">
                 <div class="phone-box">
                   <img class="phone" src="./imgs/phone.jpg" alt="">
-                  <img class="" alt="">
+                  <div class="productList-wrapper">
+                    <ul class="productList">
+                      <li class="productList-item" v-for="(item,index) in productData" :key="index">
+                        <img :src="item.openImg? item.openImg: item.defaultOpenImg" alt="">
+                        <span>{{item.productTypeName}}</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </el-col>
               <el-col class="cont">
@@ -202,6 +209,7 @@
                         <img v-if="openImgUrl" :src='openImgUrl' class="icon">
                         <i v-else class="el-icon-plus product-upload-icon"></i>
                       </el-upload>
+                      <i class="delete" @click.stop="deleteOpenImg">×</i>
                     </span>
                     <span class="upload-box" v-if="openImgUrl">
                       <div class="upload-title">
@@ -215,6 +223,7 @@
                         <img v-if="closeImgUrl" :src='closeImgUrl' class="icon">
                         <i v-else class="el-icon-plus product-upload-icon"></i>
                       </el-upload>
+                      <i class="delete" @click.stop="deleteCloseImg">×</i>
                     </span>
                   </div>
                 </div>
@@ -226,9 +235,41 @@
             </el-row>
           </div>
           <div class="step1-3" v-show="active1===5">
-            第五步
+            <!-- 第五步 服务协议和隐私声明 -->
+            <el-row class="app-config" :gutter="50" type="flex">
+              <el-col class="img-box">
+                <div class="phone-box">
+                  <img class="phone" src="./imgs/phone.jpg" alt="">
+                </div>
+              </el-col>
+              <el-col class="cont url-upload">
+                <div>
+                  服务协议：<el-input v-model="serviceAgreementUrl" placeholder="填写url或上传文件"></el-input>
+                  <el-upload
+                    class="upload-demo"
+                    action="/upload"
+                    :limit="1"
+                    :on-success="serviceAgreementUpload">
+                    <el-button size="small" type="primary">点击上传</el-button>
+                  </el-upload>
+                  <a>点击此处下载模板</a>
+                </div>
+                <div>
+                  隐私声明：<el-input v-model="privacyStatementUrl" placeholder="填写url或上传文件"></el-input>
+                  <el-upload
+                    class="upload-demo"
+                    action="/upload"
+                    :limit="1"
+                    :on-success="privacyStatementUpload">
+                    <el-button size="small" type="primary">点击上传</el-button>
+                  </el-upload>
+                  <a>点击此处下载模板</a>
+                </div>
+              </el-col>
+            </el-row>
           </div>
           <div class="step1-3" v-show="active1===6">
+            <!-- 第六步 OEM应用的风格设置 -->
             第六步
           </div>
         </div>
@@ -258,13 +299,12 @@
 import { mapState } from 'vuex'
 import 'swiper/dist/css/swiper.min.css'
 import Swiper from 'swiper/dist/js/swiper'
+import BScroll from 'better-scroll'
 
 export default {
   name: '',
   data() { 
-    return {/* 
-      active: 0,
-      active1: 0, */
+    return {
       STEPNUM_1: 6,
       introduceImg1: '', // 产品介绍图片
       introduceImg2: '',
@@ -275,6 +315,12 @@ export default {
       openImgUrl: '', // 产品开启图片的url
       closeImgUrl: '', // 产品关闭图片的url
       productTypeId: '', // 产品id
+      serviceAgreementDocument: '', // 服务协议
+      privacyStatementDocument: '', // 隐私声明
+      serviceAgreementUrl: '',
+      privacyStatementUrl: '',
+      tabRailingColor: '',
+      backgroundColor: '',
       showPublish: false
     }
   },
@@ -376,6 +422,14 @@ export default {
     // 获取产品图片
     if (this.active === 1 && this.active1 === 4) {
       this.getProductImg();
+    }
+    // 获取OEM应用的服务协议和隐私声明
+    if (this.active === 1 && this.active1 === 5) {
+      this.getAgreementAndStatement();
+    }
+    // 获取OEM应用的风格设置
+    if (this.active === 1 && this.active1 === 6) {
+      this.getOEMStyle();
     }
   },
   mounted() {
@@ -506,6 +560,15 @@ export default {
         const rs = res.data;
         console.log(rs);
         this.productData = rs.data
+        this.$nextTick(() => {
+          this.menuScroll = new BScroll('.productList-wrapper', {
+            bounce: true,
+            momentumLimitDistance: 5,
+            scrollY: true,
+            scrollbar: false,
+            mouseWheel: true,
+          })
+        })
         this.productData.forEach((item, index) => {
           const obj = {}
           obj.productTypeName = item.productTypeName;
@@ -532,15 +595,18 @@ export default {
       const productTypeId = this.productTypeId;
       const params = this.$qs.stringify({
         productTypeId,
-        openImg
+        openImg,
+        closeImg: this.closeImgUrl
       })
       this.$axios.patch('/oemApplication/ui/productImg', params).then((res) => {
         const rs = res.data;
         if (rs.success === true) {
           this.$message.success('上传成功')
+          // 成功后重新渲染产品启动图片
+          this.productImgRender();
+        } else {
+          this.$message.error(`${rs.msg}`)
         }
-        // 成功后重新渲染产品启动图片
-        this.productImgRender();
       })
     },
     // 产品关闭图片上传
@@ -550,18 +616,111 @@ export default {
       const productTypeId = this.productTypeId;
       const params = this.$qs.stringify({
         productTypeId,
+        openImg: this.openImgUrl,
         closeImg
       })
       this.$axios.patch('/oemApplication/ui/productImg', params).then((res) => {
         const rs = res.data;
         if (rs.success === true) {
           this.$message.success('上传成功')
+          // 成功后重新渲染产品关闭图片
+          this.productImgRender();
+        } else {
+          this.$message.error(`${rs.msg}`)
         }
-        // 成功后重新渲染产品关闭图片
-        this.productImgRender();
       })
     },
+    productImgRender() {
+      this.$axios.get('/oemApplication/ui/productImg').then((prodData) => {
+        this.productData = prodData.data.data;
+        // console.log(this.productData);
+        const { selectValue } = this;
+        this.productData.forEach((item) => {
+          if (selectValue === item.productTypeId) {
+            this.openImgUrl = item.openImg ? item.openImg : item.defaultOpenImg;
+            this.closeImgUrl = item.closeImg ? item.closeImg : item.defaultCloseImg;
+          }
+        })
+      })
+    }, 
+    deleteOpenImg() {
+      const openImg = null;
+      const productTypeId = this.productTypeId;
+      const params = this.$qs.stringify({
+        productTypeId,
+        openImg,
+        closeImg: this.closeImgUrl
+      })
+      this.$axios.patch('/oemApplication/ui/productImg', params).then((res) => {
+        const rs = res.data;
+        if (rs.success === true) {
+          this.$message.success('删除成功')
+          this.productImgRender();
+        } else {
+          this.$message.error(`${rs.msg}`)
+        }
+      })
+    },
+    deleteCloseImg() {
+      const closeImg = null;
+      const productTypeId = this.productTypeId;
+      const params = this.$qs.stringify({
+        productTypeId,
+        openImg: this.openImgUrl,
+        closeImg
+      })
+      this.$axios.patch('/oemApplication/ui/productImg', params).then((res) => {
+        const rs = res.data;
+        if (rs.success === true) {
+          this.$message.success('删除成功')
+          this.productImgRender();
+        } else {
+          this.$message.error(`${rs.msg}`)
+        }
+      })
+    },
+    // 获取OEM应用的服务协议和隐私声明
+    getAgreementAndStatement() {
+      this.$axios.get('/oemApplication/ui/agreementAndStatement').then((res) => {
+        const rs = res.data;
+        // console.log(rs);
+        this.serviceAgreementUrl = rs.data.serviceAgreementUrl;
+        this.privacyStatementUrl = rs.data.privacyStatementUrl;
+      })
+    },
+    // 修改OEM应用的服务协议和隐私声明
+    changeAgreementAndStatement(params) {
+      this.$axios.patch('/oemApplication/ui/agreementAndStatement', params).then((res) => {
+        const rs = res.data;
+        if (rs.success === true) {
+          this.$message.success('上传成功')
+          this.productImgRender();
+        } else {
+          this.$message.error(`${rs.msg}`)
+        }
+      })
+    },
+    // 上传服务协议和隐私声明文件
+    serviceAgreementUpload(response) {
+      const serviceAgreementDocument = response.data;
+      console.log(serviceAgreementDocument);
+      const params = this.$qs.stringify({
+        serviceAgreementDocument,
+        privacyStatementDocument: this.privacyStatementDocument
+      })
+      this.changeAgreementAndStatement(params);
+    },
+    privacyStatementUpload(response) {
+      const privacyStatementDocument = response.data;
+      console.log(privacyStatementDocument);
+      const params = this.$qs.stringify({
+        privacyStatementDocument,
+        serviceAgreementDocument: this.serviceAgreementDocument
+      })
+      this.changeAgreementAndStatement(params);
+    },
     
+
     next() {
       const { STEPNUM_1, oemApplication } = this;
       
@@ -603,6 +762,14 @@ export default {
         // 获取产品图片
         if (this.active === 1 && this.active1 === 4) {
           this.getProductImg();
+        }
+        // 获取OEM应用的服务协议和隐私声明
+        if (this.active === 1 && this.active1 === 5) {
+          this.getAgreementAndStatement();
+        }
+        // 获取OEM应用的风格设置
+        if (this.active === 1 && this.active1 === 6) {
+          this.getOEMStyle();
         }
       }
 
@@ -711,11 +878,58 @@ export default {
               position absolute
               left 15px
               top 26px
+            .productList-wrapper
+              width 150px 
+              height 356px
+              position absolute
+              left 14px
+              top 28px 
+              padding 0 10px
+              cursor pointer
+              overflow hidden
+              .productList-item
+                height 50px
+                line-height 50px
+                border-bottom 1px solid #ccc
+                display flex
+                img
+                  width 40px 
+                  height 40px
+                  display inline-block
+                  margin-top 5px
+                span 
+                  margin-left 10px  
+            .oemStyle
+              width 150px 
+              height 356px
+              position absolute
+              left 14px
+              top 28px 
+              padding 0 10px
+              .tab 
+                width 100%
+                height 50px
+                background #333
+                margin-bottom 20px
+              .bg
+                width 100%
+                height 50px
+                background #999        
         .cont 
           font-size 22px
           text-align left
           .upload-box 
             display flex
+            .delete  
+              display inline-block
+              width 20px
+              height 20px
+              line-height 20px
+              text-align center
+              font-size 20px
+              position absolute
+              right 333px
+              cursor pointer
             .upload-title
               margin-right 20px
             .product-upload
@@ -744,6 +958,14 @@ export default {
           p 
             font-size 18px
             line-height 30px 
+        .url-upload
+          padding-top 20px
+          a 
+            font-size 14px
+            color blue
+            cursor pointer
+        .oemStyle
+          padding-top 20px    
         .introduceImg-cont
           font-size 22px
           text-align left 

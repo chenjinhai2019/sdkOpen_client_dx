@@ -43,6 +43,8 @@ export default{
           type: 'success'
         });
         Cookies.remove('username')
+        Cookies.remove('active')
+        Cookies.remove('active1')
         commit(REMOVE_USER_INFO)
         router.replace('/login');
       }  
