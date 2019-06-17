@@ -270,7 +270,28 @@
           </div>
           <div class="step1-3" v-show="active1===6">
             <!-- 第六步 OEM应用的风格设置 -->
-            第六步
+            <el-row class="app-config" :gutter="50" type="flex">
+              <el-col class="img-box">
+                <div class="phone-box">
+                  <img class="phone" src="./imgs/phone.jpg" alt="">
+                  <div class="oemStyle">
+                    <div class="tab" :style="{backgroundColor: tabRailingColor}">tab颜色</div>
+                    <div class="bg" :style="{backgroundColor: backgroundColor}">background颜色</div>
+                  </div>
+                </div>
+              </el-col>
+              <el-col class="cont oemStyle">
+                <!-- 颜色取色器 -->
+                <div class="block">
+                  <div class="demonstration">tab颜色设置</div>
+                  <el-color-picker v-model="tabRailingColor"></el-color-picker>
+                </div>
+                <div class="block">
+                  <div class="demonstration">背景颜色设置</div>
+                  <el-color-picker v-model="backgroundColor"></el-color-picker>
+                </div>
+              </el-col>
+            </el-row>
           </div>
         </div>
         <!-- 第三步：功能配置  -->
@@ -719,7 +740,16 @@ export default {
       })
       this.changeAgreementAndStatement(params);
     },
-    
+    // 获取OEM应用的风格设置
+    getOEMStyle() {
+      this.$axios.get('/oemApplication/ui/style').then((res) => {
+        const rs = res.data;
+        // console.log(rs);
+        this.tabRailingColor = `#${rs.data.tabRailingColor}`;
+        this.backgroundColor = `#${rs.data.backgroundColor}`;
+        console.log(this.tabRailingColor, this.backgroundColor);
+      })
+    },
 
     next() {
       const { STEPNUM_1, oemApplication } = this;
