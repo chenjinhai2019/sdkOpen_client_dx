@@ -240,6 +240,10 @@
               <el-col class="img-box">
                 <div class="phone-box">
                   <img class="phone" src="./imgs/phone.jpg" alt="">
+                  <div class="oemStyle">
+                    <div class="serviceAgreement">服务协议{{serviceAgreementDocument}}</div>
+                    <div class="privacyStatement">隐私声明{{privacyStatementDocument}}</div>
+                  </div>
                 </div>
               </el-col>
               <el-col class="cont url-upload">
@@ -284,11 +288,11 @@
                 <!-- 颜色取色器 -->
                 <div class="block">
                   <div class="demonstration">tab颜色设置</div>
-                  <el-color-picker v-model="tabRailingColor"></el-color-picker>
+                  <el-color-picker v-model="tabRailingColor" @change="setOEMStyle"></el-color-picker>
                 </div>
                 <div class="block">
                   <div class="demonstration">背景颜色设置</div>
-                  <el-color-picker v-model="backgroundColor"></el-color-picker>
+                  <el-color-picker v-model="backgroundColor" @change="setOEMStyle"></el-color-picker>
                 </div>
               </el-col>
             </el-row>
@@ -296,7 +300,56 @@
         </div>
         <!-- 第三步：功能配置  -->
         <div class="step-container" v-show="active===2">
-          
+          <el-row class="func-config">
+            <div class="switch-box">
+              支持远程服务： 
+              <el-switch
+                v-model="remoteService"
+                active-text="开"
+                inactive-text="关"
+                @change="setOemFunction">
+              </el-switch>
+            </div>
+            <div class="switch-box">
+              支持控制SIG Mesh设备： 
+              <el-switch
+                v-model="controlSigMesh"
+                active-text="开"
+                inactive-text="关"
+                @change="setOemFunction">
+              </el-switch>
+            </div>
+            <div class="switch-box">
+              支持用户免登陆： 
+              <el-switch
+                v-model="userLogin"
+                active-text="开"
+                inactive-text="关"
+                @change="setOemFunction">
+              </el-switch>
+            </div>
+            <p>若用户需要登录App,需配置认证邮箱</p>
+          </el-row>
+          <el-row class="hide-box" v-show="!userLogin">
+            <h3>认证邮箱</h3>
+            <p>在用户注册的时候，需要用您的企业邮箱来给用户发送激活信息，请确保您所填邮箱的有效性。若您不填写该项，将默认使用晶讯邮箱发送给用户激活信息。</p>
+            <el-form label-width="100px">
+              <el-form-item label="邮箱服务器">
+                <el-input v-model="host" clearable></el-input>
+              </el-form-item>
+              <el-form-item label="账号">
+                <el-input v-model="username" clearable></el-input>
+              </el-form-item>
+              <el-form-item label="密码">
+                <el-input v-model="password" clearable show-password></el-input>
+              </el-form-item>
+              <el-form-item label="验证邮箱">
+                <el-input v-model="email" clearable></el-input>
+                <el-button type="primary">验证邮箱有效性</el-button>
+              </el-form-item>
+            </el-form>
+            <p>验证邮箱的有效性：我们将尝试用您提供的账号和密码登录您提供的邮箱服务器，并向您提供的验证邮箱发送一封确认邮件，点击确认邮件中提供的连接完成邮箱的有效性验证</p>
+          </el-row>
         </div>
         <!-- 第四步：自动构建 -->
         <div class="step-container" v-show="active===3">
@@ -322,6 +375,8 @@ import 'swiper/dist/css/swiper.min.css'
 import Swiper from 'swiper/dist/js/swiper'
 import BScroll from 'better-scroll'
 
+require('../../libs/common');
+
 export default {
   name: '',
   data() { 
@@ -342,6 +397,13 @@ export default {
       privacyStatementUrl: '',
       tabRailingColor: '',
       backgroundColor: '',
+      remoteService: false, // 支持远程服务
+      controlSigMesh: false, // 支持控制SIG Mesh设备
+      userLogin: false, // 支持用户免登陆
+      host: '',
+      username: '',
+      password: '',
+      email: '',
       showPublish: false
     }
   },
@@ -744,12 +806,36 @@ export default {
     getOEMStyle() {
       this.$axios.get('/oemApplication/ui/style').then((res) => {
         const rs = res.data;
-        // console.log(rs);
-        this.tabRailingColor = `#${rs.data.tabRailingColor}`;
-        this.backgroundColor = `#${rs.data.backgroundColor}`;
+        console.log(rs);
+        this.tabRailingColor = `${rs.data.tabRailingColor}`;
+        this.backgroundColor = `${rs.data.backgroundColor}`;
+        // console.log(this.tabRailingColor, this.backgroundColor);
+      })
+    },
+    // 修改OEM应用的风格设置
+    setOEMStyle() {
+      const tabRailingColor = `rgb${this.tabRailingColor.colorRgb()}`;
+      // console.log(tabRailingColor);
+      const backgroundColor = `rgb${this.backgroundColor.colorRgb()}`;
+      const params = this.$qs.stringify({
+        tabRailingColor,
+        backgroundColor
+      })
+      this.$axios.patch('/oemApplication/ui/style', params).then((res) => {
+        const rs = res.data;
+        this.getOEMStyle();
         console.log(this.tabRailingColor, this.backgroundColor);
       })
     },
+    // 获取OEM应用的功能配置
+    getOemFunction() {
+
+    },
+    // 修改OEM应用的功能配置
+    setOemFunction() {
+      console.log(111);
+    },
+
 
     next() {
       const { STEPNUM_1, oemApplication } = this;
@@ -853,7 +939,6 @@ export default {
   width 1200px
   margin 0 auto
   padding 0 50px
-  text-align center
   padding-bottom 50px
   .breadcrumb
     margin-bottom 50px
@@ -928,7 +1013,7 @@ export default {
                   display inline-block
                   margin-top 5px
                 span 
-                  margin-left 10px  
+                  margin-left 10px
             .oemStyle
               width 150px 
               height 356px
@@ -1012,7 +1097,30 @@ export default {
             font-size 18px
             line-height 30px     
     .create-app
-      height 170px    
+      height 170px  
+    .func-config
+      padding-left 200px
+      text-align left
+      .switch-box
+        font-size 16px 
+        font-weight 600 
+        &:first-child
+          margin-top 20px
+        margin-bottom 20px 
+        .el-switch 
+          margin-left 15px
+    .hide-box
+      padding-left 200px
+      h3 
+        font-size 16px 
+        font-weight 600 
+        margin-bottom 20px
+      p 
+        width 500px 
+        line-height 30px
+        margin-bottom 20px
+      .el-form 
+        padding 20px 0  
   .button-box
     margin-top 50px
     text-align right
