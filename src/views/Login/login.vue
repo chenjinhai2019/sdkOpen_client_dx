@@ -69,6 +69,12 @@ export default {
             type: 'success'
           });
           // console.log(rs.data);
+          const permissionList = rs.data.permissionList;
+          permissionList.forEach((item) => {
+            if (item.permissionBit === 16) {
+              Cookies.set('z_pub_pow', 0);
+            }
+          })
           const user = rs.data.username;
           const userInfo = {
             user,

@@ -15,7 +15,7 @@
           </el-step>
           <el-step title="功能配置"></el-step>
           <el-step title="自动构建"></el-step>
-          <el-step title="发布" v-if="showPublish"></el-step>
+          <el-step title="发布"></el-step>
         </el-steps>
       </el-row>
       <el-row class="step-containers">
@@ -333,19 +333,19 @@
           <el-row class="hide-box" v-show="!userLogin">
             <h3>认证邮箱</h3>
             <p>在用户注册的时候，需要用您的企业邮箱来给用户发送激活信息，请确保您所填邮箱的有效性。若您不填写该项，将默认使用晶讯邮箱发送给用户激活信息。</p>
-            <el-form label-width="100px">
-              <el-form-item label="邮箱服务器">
-                <el-input v-model="host" clearable></el-input>
+            <el-form :model="form" ref="form" label-width="100px" :rules="rules">
+              <el-form-item label="邮箱服务器" prop='host'>
+                <el-input v-model="form.host" clearable></el-input>
               </el-form-item>
-              <el-form-item label="账号">
-                <el-input v-model="username" clearable></el-input>
+              <el-form-item label="账号" prop='username'>
+                <el-input v-model="form.username" clearable></el-input>
               </el-form-item>
-              <el-form-item label="密码">
-                <el-input v-model="password" clearable show-password></el-input>
+              <el-form-item label="密码" prop='password'>
+                <el-input v-model="form.password" clearable show-password></el-input>
               </el-form-item>
-              <el-form-item label="验证邮箱">
-                <el-input v-model="email" clearable></el-input>
-                <el-button type="primary">验证邮箱有效性</el-button>
+              <el-form-item label="验证邮箱" prop='email'>
+                <el-input v-model="form.email" clearable></el-input>
+                <el-button type="primary" @click="verifyEmail">验证邮箱有效性</el-button>
               </el-form-item>
             </el-form>
             <p>验证邮箱的有效性：我们将尝试用您提供的账号和密码登录您提供的邮箱服务器，并向您提供的验证邮箱发送一封确认邮件，点击确认邮件中提供的连接完成邮箱的有效性验证</p>
@@ -353,16 +353,28 @@
         </div>
         <!-- 第四步：自动构建 -->
         <div class="step-container" v-show="active===3">
-          
+          <el-row class="create-box">
+            <div class="create" v-if="packageState===0">
+              <h3>构建app需要一定的时间，请耐心等待</h3>
+              <el-button type="primary" @click="createPackage">构建</el-button>
+            </div>
+            <div class="create-success" v-if="packageState===2">
+              <h3>构建成功</h3>
+            </div>
+            <div class="create-info" v-if="packageState===1">
+              <h3>您的app还在构建中，请耐心等待，感谢您的理解</h3>
+            </div>
+            
+          </el-row>
         </div>
-        <!-- 第五步：发布，如果没有权限的话，则隐藏该步骤 -->
+        <!-- 第五步：发布 -->
         <div class="step-container" v-show="active===4">
-          
+          第五步
         </div>
       </el-row>
       <el-row class="button-box">
         <el-button @click="prev">{{prevText}}</el-button>
-        <el-button @click="next">下一步</el-button>
+        <el-button @click="next" v-show="showNextBtn">下一步</el-button>
       </el-row>
     </el-main>
     
@@ -375,7 +387,6 @@ import 'swiper/dist/css/swiper.min.css'
 import Swiper from 'swiper/dist/js/swiper'
 import BScroll from 'better-scroll'
 
-require('../../libs/common');
 
 export default {
   name: '',
@@ -400,11 +411,28 @@ export default {
       remoteService: false, // 支持远程服务
       controlSigMesh: false, // 支持控制SIG Mesh设备
       userLogin: false, // 支持用户免登陆
-      host: '',
-      username: '',
-      password: '',
-      email: '',
-      showPublish: false
+      form: {
+        host: '',
+        username: '',
+        password: '',
+        email: '',
+      },
+      rules: {
+        host: [
+          { required: true, message: '请输入邮箱服务地址' }
+        ],
+        username: [
+          { required: true, message: '请输入用户名' }
+        ],
+        password: [
+          { required: true, message: '请输入密码' }
+        ],
+        email: [
+          { required: true, message: '请输入邮箱' }
+        ],
+      },
+      packageState: '', // 应用构建状态
+      showNextBtn: true,
     }
   },
   computed: {
@@ -513,6 +541,14 @@ export default {
     // 获取OEM应用的风格设置
     if (this.active === 1 && this.active1 === 6) {
       this.getOEMStyle();
+    }
+    // 获取OEM应用的功能配置
+    if (this.active === 2) {
+      this.getOemFunction();
+    }
+    // 检查OEM应用构建情况
+    if (this.active === 3) {
+      this.checkPackage();
     }
   },
   mounted() {
@@ -807,16 +843,16 @@ export default {
       this.$axios.get('/oemApplication/ui/style').then((res) => {
         const rs = res.data;
         console.log(rs);
-        this.tabRailingColor = `${rs.data.tabRailingColor}`;
-        this.backgroundColor = `${rs.data.backgroundColor}`;
+        this.tabRailingColor = `#${rs.data.tabRailingColor}`;
+        this.backgroundColor = `#${rs.data.backgroundColor}`;
         // console.log(this.tabRailingColor, this.backgroundColor);
       })
     },
     // 修改OEM应用的风格设置
     setOEMStyle() {
-      const tabRailingColor = `rgb${this.tabRailingColor.colorRgb()}`;
+      const tabRailingColor = this.tabRailingColor.substr(1);
       // console.log(tabRailingColor);
-      const backgroundColor = `rgb${this.backgroundColor.colorRgb()}`;
+      const backgroundColor = this.backgroundColor.substr(1);
       const params = this.$qs.stringify({
         tabRailingColor,
         backgroundColor
@@ -824,94 +860,212 @@ export default {
       this.$axios.patch('/oemApplication/ui/style', params).then((res) => {
         const rs = res.data;
         this.getOEMStyle();
-        console.log(this.tabRailingColor, this.backgroundColor);
+        // console.log(this.tabRailingColor, this.backgroundColor);
       })
     },
     // 获取OEM应用的功能配置
     getOemFunction() {
-
+      this.$axios.get('/oemApplication/function').then((res) => {
+        const rs = res.data;
+        console.log(rs);
+        this.remoteService = rs.data.remoteService
+        this.controlSigMesh = rs.data.controlSigMesh
+        this.userLogin = rs.data.userLogin
+      })
     },
     // 修改OEM应用的功能配置
     setOemFunction() {
-      console.log(111);
+      let { remoteService, controlSigMesh, userLogin } = this;
+      const params = this.$qs.stringify({
+        remoteService,
+        controlSigMesh,
+        userLogin
+      })
+      this.$axios.patch('/oemApplication/function', params).then((res) => {
+        if (res.data.success === true) {
+          this.$message.success('修改成功')
+        }
+      }).catch((err) => {
+        this.$message.error(err);
+      })
     },
-
+    // 验证邮箱有效性
+    verifyEmail() {
+      const { form } = this;
+      const params = this.$qs.stringify(form)
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.$axios.post('/oemApplication/email', params).then((res) => {
+            const rs = res.data;
+            if (rs.success === true) {
+              this.$message.info('验证成功，请激活邮箱');
+            } else {
+              this.$message.error(`${rs.msg}`);
+            }
+          }).catch((error) => {
+            this.$message.error(error);
+          })
+        }
+      })
+    },
+    // 检查认证邮箱是否已激活
+    checkEmail() {
+      this.$axios.get('/oemApplication/checkEmail').then((res) => {
+        const rs = res.data;
+        if (rs.data.active === false) {
+          this.$message.info('邮箱还未激活，将默认使用晶讯邮箱发送给用户激活信息')
+        } else {
+          this.$message.success('邮箱已激活')
+        }
+      })
+    },
+    // 检查OEM应用构建情况
+    checkPackage() {
+      this.$axios.get('/oemApplication/checkPackage').then((res) => {
+        const rs = res.data;
+        console.log(rs);
+        this.packageState = rs.data.packageState;
+      })
+    },
+    // 构建OEM应用
+    createPackage() {
+      this.$axios.post('/oemApplication/package').then((res) => {
+        this.$message.success('构建成功，请等待')  
+        this.checkPackage()
+      })
+    },
 
     next() {
       const { STEPNUM_1, oemApplication } = this;
-      
+      // debugger;
       if (this.active === 0) {
         this.active = 1;
       }
       if (this.active === 1) {
         this.active1++;
+        // 获取logo
+        if (this.active1 === 1) {
+          this.getLogo()
+        }
+        // 获取启动图片
+        if (this.active1 === 2) {
+          this.getStartImg()
+        }
+        // 获取介绍图片
+        if (this.active1 === 3) {
+          this.getIntroduceImg();
+        } 
+        // 获取产品图片
+        if (this.active1 === 4) {
+          this.getProductImg();
+        }
+        // 获取OEM应用的服务协议和隐私声明
+        if (this.active1 === 5) {
+          this.getAgreementAndStatement();
+        }
+        // 获取OEM应用的风格设置
+        if (this.active1 === 6) {
+          this.getOEMStyle();
+        }
+        // 保存当前的步骤
+        this.$cookies.set('active', this.active)
+        this.$cookies.set('active1', this.active1)
         if (this.active1 > STEPNUM_1) {
-          this.active = 2
-          return false
+          this.active = 2;
+          // 获取OEM应用的功能配置
+          if (this.active === 2) {
+            this.getOemFunction();
+          }
+          this.active1 = STEPNUM_1;
+          this.$cookies.set('active', this.active)
+          this.$cookies.set('active1', this.active1)
+          return false;
         }
       }
-      if (this.active >= 2 && this.active !== 1) {
-        this.active++
+      if (this.active === 2) {
+        this.active = 3;
+        this.checkEmail(); // 验证邮箱
+        this.checkPackage();
+        this.$cookies.set('active', this.active)
+        return false;
+      }
+      if (this.active === 3) {
+        this.active = 4; // 发布
+        this.showNextBtn = false;
+        this.$cookies.set('active', this.active)
+        return false;
       }
       console.log(this.active, this.active1);
       // 第一步 this.active = 1，如果没有id，则创建app; 如果有id，则直接进入下一步
       if (!oemApplication.id) { // 没有创建app
-        if (this.active === 1) {
-          // console.log(111);
-        }
-        /* if (this.active === 2 && this.active1 === 0) {
-          console.log(2222);
-        } */
+        
       } else { // 已经创建app
-        // 获取logo
-        if (this.active === 1 && this.active1 === 1) {
-          this.getLogo()
-        }
-        // 获取启动图片
-        if (this.active === 1 && this.active1 === 2) {
-          this.getStartImg()
-        }
-        // 获取介绍图片
-        if (this.active === 1 && this.active1 === 3) {
-          this.getIntroduceImg();
-        } 
-        // 获取产品图片
-        if (this.active === 1 && this.active1 === 4) {
-          this.getProductImg();
-        }
-        // 获取OEM应用的服务协议和隐私声明
-        if (this.active === 1 && this.active1 === 5) {
-          this.getAgreementAndStatement();
-        }
-        // 获取OEM应用的风格设置
-        if (this.active === 1 && this.active1 === 6) {
-          this.getOEMStyle();
-        }
+        
       }
-
-      // 保存当前的步骤
-      this.$cookies.set('active', this.active)
-      this.$cookies.set('active1', this.active1)
       // this.$store.commit('stepNow', { active: this.active, active1: this.active1 });
     },
     prev() {
-      if (this.active !== 1 && this.active !== 0) {
-        this.active--
+      // debugger;
+      if (this.active === 4) {
+        this.active = 3;
+        this.showNextBtn = true;
+        this.checkPackage();
+        this.$cookies.set('active', this.active)
+        return false;
+      }
+      if (this.active === 3) {
+        this.active = 2;
+        this.getOemFunction();
+        this.$cookies.set('active', this.active)
+        return false;
+      }
+      if (this.active === 2) {
+        this.active = 1;
+        // 获取OEM应用的风格设置
+        if (this.active1 === 6) {
+          this.getOEMStyle();
+        }
+        this.$cookies.set('active', this.active)
+        return false;
+      }
+      
+      if (this.active === 1) {
+        this.active1--
+        // 获取logo
+        if (this.active1 === 1) {
+          this.getLogo()
+        }
+        // 获取启动图片
+        if (this.active1 === 2) {
+          this.getStartImg()
+        }
+        // 获取介绍图片
+        if (this.active1 === 3) {
+          this.getIntroduceImg();
+        } 
+        // 获取产品图片
+        if (this.active1 === 4) {
+          this.getProductImg();
+        }
+        // 获取OEM应用的服务协议和隐私声明
+        if (this.active1 === 5) {
+          this.getAgreementAndStatement();
+        }
+        
+        if (this.active1 < 1) {
+          this.active = 0;
+          this.active1 = 0;
+          this.$cookies.set('active', this.active)
+          this.$cookies.set('active1', this.active1)
+          return false;
+        }
+        this.$cookies.set('active', this.active)
+        this.$cookies.set('active1', this.active1)
       }
       if (this.active === 0) {
         this.$router.push('/manageCenter/applicationManage')
       }
-      if (this.active === 1) {
-        this.active1--
-        if (this.active1 < 1) {
-          this.active = 0;
-          // return false;
-        }
-        console.log(this.active, this.active1);
-      }
-      // 保存当前的步骤
-      this.$cookies.set('active', this.active)
-      this.$cookies.set('active1', this.active1)
+      
       // this.$store.commit('stepNow', { active: this.active, active1: this.active1 });
     }
   },
@@ -955,6 +1109,7 @@ export default {
       .el-input 
         width 300px
       .app-config 
+        text-align center
         .img-box
           .phone-box 
             width 200px
@@ -1097,7 +1252,8 @@ export default {
             font-size 18px
             line-height 30px     
     .create-app
-      height 170px  
+      height 170px 
+      text-align center 
     .func-config
       padding-left 200px
       text-align left
@@ -1121,6 +1277,11 @@ export default {
         margin-bottom 20px
       .el-form 
         padding 20px 0  
+    .create-box
+      text-align center  
+      h3 
+        font-size 18px
+        margin 50px 0  
   .button-box
     margin-top 50px
     text-align right
