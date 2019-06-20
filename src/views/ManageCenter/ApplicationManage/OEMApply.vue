@@ -55,6 +55,7 @@
                     action="/upload"
                     :show-file-list="false"
                     :on-exceed="logoHandleExceed"
+                    :before-upload="beforeLogoUpload"
                     :on-success="logoUpload">
                     <el-button size="small" type="primary">点击上传</el-button>
                     <div slot="tip" class="el-upload__tip">只能上传png文件，且不超过5M</div>
@@ -84,13 +85,14 @@
                     action="/upload"
                     :show-file-list="false"
                     :on-exceed="logoHandleExceed"
+                    :before-upload="beforeStartImgUpload"
                     :on-success="startImgUpload">
                     <el-button size="small" type="primary">点击上传</el-button>
                     <div slot="tip" class="el-upload__tip">只能上传png文件，且不超过5M</div>
                   </el-upload>
                 </div>
                 <p>App启动图片</p>
-                <p>分辨率：1024*1024</p>
+                <p>分辨率：1242*2808</p>
                 <p>格式：.png</p>
                 <p>文件大小： 小于5M</p>
               </el-col>
@@ -162,7 +164,7 @@
                   </div>
                 </div>
                 <p>用于让用户更多的了解你的应用，若你不想添加介绍内容，可选择禁用</p>
-                <p>分辨率：1024*1024</p>
+                <p>分辨率：1242*2808</p>
                 <p>格式：.png</p>
                 <p>文件大小： 小于5M</p>
               </el-col>
@@ -241,8 +243,9 @@
                 <div class="phone-box">
                   <img class="phone" src="./imgs/phone.jpg" alt="">
                   <div class="oemStyle">
-                    <div class="serviceAgreement">服务协议{{serviceAgreementDocument}}</div>
-                    <div class="privacyStatement">隐私声明{{privacyStatementDocument}}</div>
+                    <div class="serviceAgreement">服务协议:{{serviceAgreementDocument}}</div>
+                    <div style="margin:10px 0;"></div>
+                    <div class="privacyStatement">隐私声明:{{privacyStatementDocument}}</div>
                   </div>
                 </div>
               </el-col>
@@ -369,7 +372,42 @@
         </div>
         <!-- 第五步：发布 -->
         <div class="step-container" v-show="active===4">
-          第五步
+          <el-row class="publish-box">
+            <div class="publish" v-if="publishState===0">
+              <h3>应用状态：开发中</h3>
+              <p>发布前请确认您的应用信息,提交发布后将无法修改</p>
+              <el-form :model="publishForm" ref="publishForm" label-width="140px" :rules="publishRules">
+                <el-form-item label="Google邀请账号" prop='googleAccount'>
+                  <el-input v-model="publishForm.googleAccount"></el-input>
+                  <el-button type="primary">操作指南</el-button>
+                </el-form-item>
+                <el-form-item label="AppStore邀请账号" prop='appStoreAccount'>
+                  <el-input v-model="publishForm.appStoreAccount"></el-input>
+                  <el-button type="primary">操作指南</el-button>
+                </el-form-item>
+                <el-form-item label="国内Android市场" prop='androidMarket'>
+                  <el-input v-model="publishForm.androidMarket"></el-input>
+                  <el-button type="primary">软著模板</el-button>
+                </el-form-item>
+              </el-form>
+              <p>联系我们的业务人员进行线下沟通，当我们收到业务人员通知后，我们将在一周内完成ios应用上架，三个工作日内完成Android应用上架。（排除应用市场审核方原因，对于此类情况我们会及时进行通知）</p>
+              <div>
+                <span>业务人员： XXX</span>
+                <span>联系电话： XXX-XXXXXXX</span>
+                <span>服务时间： 9:00-18:00</span>
+              </div>
+              <el-button class="publish-btn" type="primary" @click="publishApp">发布</el-button>
+            </div>
+
+            <div class="publish-info" v-if="publishState===1">
+              <p>我们已收到您的发布申请</p>
+              <p>若您还未与我们的业务人员进行线下沟通，请及时沟通，若您还已与我们的业务人员沟通完成，请耐心等待，我们会加班加点为您发布应用。</p>
+            </div>
+
+            <div class="publish-success" v-if="publishState===3">
+              <p>恭喜您，应用已发布</p>
+            </div>
+          </el-row>
         </div>
       </el-row>
       <el-row class="button-box">
@@ -432,6 +470,23 @@ export default {
         ],
       },
       packageState: '', // 应用构建状态
+      publishForm: {
+        googleAccount: '',
+        appStoreAccount: '',
+        androidMarket: '',
+      },
+      publishRules: {
+        googleAccount: [
+          { required: true, message: '请输入google邀请账号' }
+        ],
+        appStoreAccount: [
+          { required: true, message: '请输入AppStore邀请账号' }
+        ],
+        androidMarket: [
+          { required: true, message: '请输入国内Android市场' }
+        ],
+      },
+      publishState: 0, // 应用发布状态
       showNextBtn: true,
     }
   },
@@ -514,10 +569,6 @@ export default {
     },
   },
   created() {
-    /* this.getLogo()
-    this.getStartImg()
-    this.getIntroduceImg();
-    this.getProductImg(); */
     // 获取logo
     if (this.active === 1 && this.active1 === 1) {
       this.getLogo()
@@ -549,6 +600,10 @@ export default {
     // 检查OEM应用构建情况
     if (this.active === 3) {
       this.checkPackage();
+    }
+    // 检查OEM应用发布情况
+    if (this.active === 4) {
+      this.checkPublishState();
     }
   },
   mounted() {
@@ -584,6 +639,35 @@ export default {
     logoHandleExceed() {
       this.$message.warning('仅能上传一张图片')
     },
+    // 检查上传logo图片是否符合要求
+    beforeLogoUpload(file) {
+      console.log(file)
+      const isPNG = file.type === 'image/png';
+      const limit5M = file.size / 1024 / 1024 < 5;
+      const isSize = new Promise((resolve, reject) => {
+        let width = 1024;
+        let height = 1024;
+        let _URL = window.URL || window.webkitURL;
+        let img = new Image();
+        img.onload = function () {
+          let valid = img.width === width && img.height === height;
+          valid ? resolve() : reject();
+        }
+        img.src = _URL.createObjectURL(file);
+      }).then(() => {
+        return file;
+      }, () => {
+        this.$message.error('图片尺寸限制为1024*1024')
+      })
+      if (!isPNG) {
+        this.$message.error('上传头像图片只能是png格式');
+      }
+      if (!limit5M) {
+        this.$message.error('上传头像图片大小不能超过5MB');
+      }
+      return isPNG && limit5M && isSize;
+    },
+
     // 上传logo成功，修改logo
     logoUpload(response, file, fileList) {
       const logo = response.data;
@@ -604,6 +688,10 @@ export default {
     // 获取启动图片
     getStartImg() {
       this.$store.dispatch('getStartImg');
+    },
+    // 检查上传logo是否符合要求
+    beforeStartImgUpload() {
+
     },
     // 上传启动图片成功， 修改启动图片
     startImgUpload(response, file, fileList) {
@@ -805,15 +893,18 @@ export default {
         // console.log(rs);
         this.serviceAgreementUrl = rs.data.serviceAgreementUrl;
         this.privacyStatementUrl = rs.data.privacyStatementUrl;
+        this.serviceAgreementDocument = rs.data.serviceAgreementDocument
+        this.privacyStatementDocument = rs.data.privacyStatementDocument
       })
     },
     // 修改OEM应用的服务协议和隐私声明
     changeAgreementAndStatement(params) {
       this.$axios.patch('/oemApplication/ui/agreementAndStatement', params).then((res) => {
         const rs = res.data;
+        console.log(rs)
         if (rs.success === true) {
           this.$message.success('上传成功')
-          this.productImgRender();
+          this.getAgreementAndStatement()
         } else {
           this.$message.error(`${rs.msg}`)
         }
@@ -825,7 +916,9 @@ export default {
       console.log(serviceAgreementDocument);
       const params = this.$qs.stringify({
         serviceAgreementDocument,
-        privacyStatementDocument: this.privacyStatementDocument
+        privacyStatementDocument: this.privacyStatementDocument,
+        serviceAgreementUrl: this.serviceAgreementUrl,
+        privacyStatementUrl: this.privacyStatementUrl
       })
       this.changeAgreementAndStatement(params);
     },
@@ -834,7 +927,9 @@ export default {
       console.log(privacyStatementDocument);
       const params = this.$qs.stringify({
         privacyStatementDocument,
-        serviceAgreementDocument: this.serviceAgreementDocument
+        serviceAgreementDocument: this.serviceAgreementDocument,
+        serviceAgreementUrl: this.serviceAgreementUrl,
+        privacyStatementUrl: this.privacyStatementUrl
       })
       this.changeAgreementAndStatement(params);
     },
@@ -934,6 +1029,39 @@ export default {
         this.checkPackage()
       })
     },
+    // 检查OEM应用发布情况
+    checkPublishState() {
+      this.$axios.get('/oemApplication/checkPublish').then((res) => {
+        const rs = res.data;
+        console.log(rs);
+        this.publishState = rs.data.state;
+      })
+    },
+    // 发布OEM应用
+    publishApp() {
+      const power = parseInt(this.$cookies.get('z_pub_pow'), 10);
+      const { publishForm } = -this;
+      // debugger;
+      this.$refs.publishForm.validate((valid) => {
+        if (valid) {
+          if (power !== 0) {
+            this.$message.error('抱歉，你没有发布的权限')
+            return false;
+          } else {
+            const params = this.$qs.stringify(publishForm); 
+            this.$axios.post('/oemApplication/publish', params).then((res) => {
+              const rs = res.data;
+              if (rs.success === true) {
+                this.$message.success('发布成功');
+                this.checkPublishState()
+              } else {
+                this.$message.error(`${rs.msg}`);
+              }
+            })
+          }
+        }
+      })
+    },
 
     next() {
       const { STEPNUM_1, oemApplication } = this;
@@ -991,6 +1119,7 @@ export default {
       }
       if (this.active === 3) {
         this.active = 4; // 发布
+        this.checkPublishState();
         this.showNextBtn = false;
         this.$cookies.set('active', this.active)
         return false;
@@ -1100,6 +1229,9 @@ export default {
       height 60px
       line-height 60px
       font-size 16px
+  .el-steps
+    .el-step
+      cursor pointer
   .step-containers
     width 90%
     margin 50px auto 0
@@ -1282,6 +1414,27 @@ export default {
       h3 
         font-size 18px
         margin 50px 0  
+    .publish-box
+      margin-left 200px
+      .publish,.publish-info,.publish-success
+        h3
+          font-size 18px
+          font-weight bold
+          margin-top 20px
+          margin-bottom 10px
+        p
+          width 600px
+          font-size 16px  
+          line-height 30px
+        .el-form
+          margin-top 30px
+        span
+          display inline-block
+          font-size 16px  
+          margin-top 10px  
+        .publish-btn
+          margin-top 30px
+          margin-left 260px
   .button-box
     margin-top 50px
     text-align right

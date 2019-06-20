@@ -1,5 +1,4 @@
 /* eslint-disable no-extend-native */
-/* eslint-disable func-names */
 String.prototype.colorRgb = function () {
   let sColor = this.toLowerCase()
   // 十六进制颜色值的正则表达式

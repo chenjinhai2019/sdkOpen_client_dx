@@ -66,5 +66,7 @@ module.exports = {
     'arrow-body-style': 0,  //该规则可以强制或禁止在箭头函数体的周围使用大括号。
     'no-underscore-dangle': 0, //此规则不允许在标识符中使用悬空下划线 _this
     'no-lonely-if': 0, // else里不能只有一个if
+    'func-names': 0, // 函数名
+    'no-unused-expressions': [2, { 'allowShortCircuit': false, 'allowTernary': true }], // 允许三目运算符
   }
 }
