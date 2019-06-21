@@ -9,13 +9,13 @@
       </el-row>
       <el-row>
         <el-steps :active="active" finish-status="success" align-center>
-          <el-step title="创建App"></el-step>
-          <el-step title="UI配置">
+          <el-step title="创建App" @click.native="step1"></el-step>
+          <el-step title="UI配置" @click.native="step2">
             <el-steps :active="active1"></el-steps>
           </el-step>
-          <el-step title="功能配置"></el-step>
-          <el-step title="自动构建"></el-step>
-          <el-step title="发布"></el-step>
+          <el-step title="功能配置" @click.native="step3"></el-step>
+          <el-step title="自动构建" @click.native="step4"></el-step>
+          <el-step title="发布" @click.native ="step5"></el-step>
         </el-steps>
       </el-row>
       <el-row class="step-containers">
@@ -610,6 +610,32 @@ export default {
     this.$store.dispatch('checkOemApplication');
   },
   methods: {
+    step1() {
+      this.active = 0;
+      this.$cookies.set('active', this.active)
+    },
+    step2() {
+      this.active = 1;
+      this.active1 = 1;
+      this.getLogo()
+      this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
+    },
+    step3() {
+      this.active = 2;
+      this.getOemFunction();
+      this.$cookies.set('active', this.active)
+    },
+    step4() {
+      this.active = 3;
+      this.checkPackage();
+      this.$cookies.set('active', this.active)
+    },
+    step5() {
+      this.active = 4;
+      this.checkPublishState();
+      this.$cookies.set('active', this.active)
+    },
     // 创建app的应用名，包名和版本号
     createApplication() {
       const { oemApplication, appName, appPackName, appVersion } = this;
