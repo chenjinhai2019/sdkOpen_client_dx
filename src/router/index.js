@@ -83,7 +83,13 @@ const router = new Router({
               meta: {
                 hideHeader: true,
                 activeMenu: '/manageCenter/applicationManage'
-              }
+              },
+              children: [
+                {
+                  path: 'createSDK',
+                  name: 'createSDK',
+                }
+              ]
             },
           ]
         },
