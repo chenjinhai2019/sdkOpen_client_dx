@@ -612,7 +612,9 @@ export default {
   methods: {
     step1() {
       this.active = 0;
+      this.active1 = 0;
       this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
     },
     step2() {
       this.active = 1;
@@ -623,18 +625,24 @@ export default {
     },
     step3() {
       this.active = 2;
+      this.active1 = 6;
       this.getOemFunction();
       this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
     },
     step4() {
       this.active = 3;
+      this.active1 = 6;
       this.checkPackage();
       this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
     },
     step5() {
       this.active = 4;
+      this.active1 = 6;
       this.checkPublishState();
       this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
     },
     // 创建app的应用名，包名和版本号
     createApplication() {

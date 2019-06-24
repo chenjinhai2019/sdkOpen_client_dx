@@ -88,6 +88,11 @@ const router = new Router({
                 {
                   path: 'createSDK',
                   name: 'createSDK',
+                  component: resolve => require(['views/ManageCenter/ApplicationManage/CreateSDK.vue'], resolve),
+                  meta: {
+                    hideHeader: true,
+                    activeMenu: '/manageCenter/applicationManage'
+                  },
                 }
               ]
             },

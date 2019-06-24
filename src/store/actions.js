@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { Message } from 'element-ui';
+import { clearCookie } from '../libs/common'
 import {
   RECEIVE_BANNERIMGS,
   USER_INFO,
@@ -42,9 +43,7 @@ export default{
           message: '退出成功',
           type: 'success'
         });
-        Cookies.remove('username')
-        Cookies.remove('active')
-        Cookies.remove('active1')
+        clearCookie();
         commit(REMOVE_USER_INFO)
         router.replace('/login');
       }  
