@@ -1074,7 +1074,7 @@ export default {
     // 发布OEM应用
     publishApp() {
       const power = parseInt(this.$cookies.get('z_pub_pow'), 10);
-      const { publishForm } = -this;
+      const { publishForm } = this;
       // debugger;
       this.$refs.publishForm.validate((valid) => {
         if (valid) {

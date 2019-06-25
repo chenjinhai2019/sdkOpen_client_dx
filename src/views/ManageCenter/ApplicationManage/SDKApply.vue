@@ -75,12 +75,14 @@ export default {
       font-size 16px 
   .application-list
     display flex
+    flex-wrap wrap
     li
-      width 200px
+      min-width 199px
       height 300px
       border 1px solid #333
       border-radius 20px
       margin-right 20px
+      margin-bottom 10px
       cursor pointer
       &.add-application
         text-align center
@@ -88,7 +90,7 @@ export default {
         font-size 150px
       &.item
         box-sizing border-box 
-        padding 20px 0  
+        padding 20px 0
         font-size 16px
         p
           margin-left 10px

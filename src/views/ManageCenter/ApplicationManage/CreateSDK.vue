@@ -9,15 +9,18 @@
     </el-row>
     <el-row class="step-containers">
       <div class="step-container form-box" v-show="sdkActive===0">
-        <el-form :model="form" label-width="100px">
-          <el-form-item label="应用名">
+        <el-form :model="form" ref="sdkApplyForm" label-width="100px" :rules="sdkRules">
+          <el-form-item label="应用名" prop="applicationName">
             <el-input v-model="form.applicationName"></el-input>
           </el-form-item>
-          <el-form-item label="应用ID">
+          <el-form-item label="应用ID" prop="applicationId">
             <el-input v-model="form.applicationId"></el-input>
           </el-form-item>
-          <el-form-item label="应用描述">
+          <el-form-item label="应用描述" prop="applicationDescribtion">
             <el-input type="textarea" v-model="form.applicationDescribtion"></el-input>
+          </el-form-item>
+          <el-form-item v-show="!id">
+            <el-button type="primary" style="margin-left:160px" @click="sdkApply">提交申请</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -56,16 +59,23 @@
         </el-row>
       </div>
       <div class="step-container" v-show="sdkActive===2">
-        <el-row>
-          <h3>SDK引用地址：</h3>
-          <p>fdfsdfsfsfsdfsfsfsfssfsddf</p>
-          
+        <el-row class="sdk-info">
+          <div class="sdk-download">
+            <h3>SDK下载</h3>
+            <img src="./imgs/ios-logo.png" alt="">
+            <img src="./imgs/android-logo.png" alt="">
+          </div>
+          <div class="tip">具体操作查看 <a href="">开发文档</a></div>
+          <div class="key-info">
+            <div>KeyId: {{keyId}}</div>
+            <div>KeySecret: {{keySecret}}</div>
+          </div>
         </el-row>
       </div>
     </el-row>
     <el-row class="button-box">
       <el-button @click="prev">{{prevText}}</el-button>
-      <el-button @click="next">下一步</el-button>
+      <el-button @click="next" v-show="showNextBtn">下一步</el-button>
     </el-row>
   </div>
 </template>
@@ -81,6 +91,17 @@ export default {
         applicationName: '',
         applicationId: '',
         applicationDescribtion: ''
+      },
+      sdkRules: {
+        applicationName: [
+          { required: true, message: '请输入应用名称' }
+        ],
+        applicationId: [
+          { required: true, message: '请输入应用ID' }
+        ],
+        applicationDescribtion: [
+          { required: true, message: '请输入应用描述' }
+        ],
       },
       userLogin: false,
       hideForm: {
@@ -103,6 +124,11 @@ export default {
           { required: true, message: '请输入邮箱' }
         ],
       },
+      keyId: '',
+      keySecret: '',
+      androidPath: '',
+      iosPath: '',
+      showNextBtn: true
     }
   },
   computed: {
@@ -116,6 +142,9 @@ export default {
     }
     if (this.sdkActive === 1) {
       this.getUserLogin();
+    }
+    if (this.sdkActive === 2) {
+      this.getSDKInfo() // 获取SDK的认证信息和下载路径
     }
   },
   methods: {
@@ -201,10 +230,42 @@ export default {
         })
       }
     },
+    // 获取SDK的认证信息和下载路径
+    getSDKInfo() {
+      this.$axios.get(`/sdk/${this.id}/key`).then((res) => {
+        const rs = res.data;
+        console.log(rs);
+        this.keyId = rs.data.keyId;
+        this.keySecret = rs.data.keySecret;
+        this.iosPath = rs.data.iosPath;
+        this.androidPath = rs.data.androidPath;
+      })
+    },
+    // 申请SDK
+    sdkApply() {
+      const { form } = this;
+      const params = this.$qs.stringify(form)
+      this.$refs.sdkApplyForm.validate((valid) => {
+        if (valid) {
+          this.$axios.post('/sdk', params).then((res) => {
+            const rs = res.data;
+            // console.log(rs);
+            if (rs.success === true) {
+              this.id = rs.data.id;
+              this.$router.push({ name: 'createSDK', query: { id: rs.data.id } })
+              this.$message.success('申请成功')
+            } else {
+              this.$message.error('申请失败') 
+            }
+          })
+        } 
+      })
+    },
     prev() {
       if (this.sdkActive === 2) {
         this.sdkActive = 1;
         this.getUserLogin();
+        this.showNextBtn = true;
         this.$cookies.set('sdkActive', 1)
         return false;
       }
@@ -226,6 +287,8 @@ export default {
         this.getUserLogin();
         this.sdkActive = 2
         this.checkEmail(); // 验证邮箱
+        this.getSDKInfo() // 获取SDK的认证信息和下载路径
+        this.showNextBtn = false;
         this.$cookies.set('sdkActive', 2)
       }
       if (this.sdkActive > 2) {
@@ -273,6 +336,27 @@ export default {
           padding 20px 0
           .el-input 
             width 60%
+      .sdk-info
+        padding-left 100px
+        .sdk-download 
+          margin-bottom 30px
+          h3 
+            font-size 18px 
+            font-weight 600 
+            margin-bottom 20px
+          img 
+            margin 0 30px 
+            cursor pointer 
+        .tip 
+          font-size 16px
+          margin-bottom 30px    
+          a 
+            color blue
+        .key-info
+          font-size 18px  
+          div
+            margin-bottom 20px
+                 
   .button-box
     margin-top 50px
     text-align right

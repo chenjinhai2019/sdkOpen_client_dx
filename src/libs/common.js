@@ -23,8 +23,8 @@ module.exports = {
   clearCookie() { 
     // eslint-disable-next-line no-useless-escape
     let keys = document.cookie.match(/[^ =;]+(?=\=)/g);
-    console.log(document.cookie);
-    console.log(keys);
+    // console.log(document.cookie);
+    // console.log(keys);
     if (keys) { 
       for (let i = keys.length; i--;) { document.cookie = `${keys[i]}=0;expires=${new Date(0).toUTCString()}` } 
     } 
