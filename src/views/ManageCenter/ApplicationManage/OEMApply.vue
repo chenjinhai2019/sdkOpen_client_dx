@@ -179,7 +179,7 @@
                   <div class="productList-wrapper">
                     <ul class="productList">
                       <li class="productList-item" v-for="(item,index) in productData" :key="index">
-                        <img :src="item.openImg? item.openImg: item.defaultOpenImg" alt="">
+                        <img :src="item.openImg? item.openImg: item.defaultOpenImg" alt="" @click="setSelectValue(item)">
                         <span>{{item.productTypeName}}</span>
                       </li>
                     </ul>
@@ -300,6 +300,67 @@
               </el-col>
             </el-row>
           </div>
+          <div class="" v-show="active1===7">
+            <!-- 第七步 显示所有ui配置 -->
+            <el-row class="config-wrapper">
+              <div class="config-item">
+                <el-button type="primary" @click="toStartImg">修改</el-button>
+                <span class="title">启动图片:</span>
+                <img :src="configData.startImg" alt="">
+              </div>
+              <div class="config-item">
+                <el-button type="primary" @click="toIntroduceImg">修改</el-button>
+                <span class="title">介绍图片:</span>
+                <img :src="item" v-for="(item,index) in uiIntroduceImgs" :key="index" alt="">
+              </div>
+              <div class="config-item product-img">
+                <div class="product-title">
+                  <el-button type="primary" @click="toProductImg">修改</el-button>
+                  <span class="title">产品图片:</span>
+                  <span>产品类型:</span>
+                  <el-select v-model="uiSelectValue" @change="showUIProductImg" placeholder="请选择" clearable>
+                    <el-option
+                      v-for="item in uiOptions"
+                      :key="item.productTypeId"
+                      :label="item.productTypeName"
+                      :value="item.productTypeId">
+                    </el-option>
+                  </el-select>
+                </div>
+                <div class="img-box" v-if="uiOpenImgUrl">
+                  <span class="upload-box">开:</span>
+                  <img :src="uiOpenImgUrl" alt="">
+                  <span class="upload-box">关:</span>
+                  <img :src="uiCloseImgUrl" alt="">
+                </div>
+              </div> 
+              <div class="config-item word">
+                <el-button type="primary" @click="toSetFile">修改</el-button>
+                <span class="title">服务协议:</span>
+                <img src="./imgs/word.png" @click="downloadService" alt="">
+                <i>点击文件进行下载</i>
+                <div class="" style="margin-left: 95px; margin-top:10px">
+                  <span class="title">隐私声明:</span>
+                  <img src="./imgs/word.png" @click="downloadPrivacyStatement" alt="">
+                  <i>点击文件进行下载</i>
+                </div>
+              </div>
+              <div class="config-item color-box">
+                <el-button type="primary" @click="toSetColor">修改</el-button>
+                <span class="title">风格设置:</span>
+                <div class="color-item">
+                  <span>tab栏颜色：</span>
+                  <span class="color" :style="{backgroundColor: '#'+configData.tabRailingColor}"></span>
+                  <span>{{'#'+configData.tabRailingColor}}</span>
+                </div>
+                <div class="color-item">
+                  <span>背景颜色：</span>
+                  <span class="color" :style="{backgroundColor: '#'+configData.backgroundColor}"></span>
+                  <span>{{'#'+configData.backgroundColor}}</span>
+                </div>
+              </div>
+            </el-row>
+          </div>
         </div>
         <!-- 第三步：功能配置  -->
         <div class="step-container" v-show="active===2">
@@ -333,7 +394,7 @@
             </div>
             <p>若用户需要登录App,需配置认证邮箱</p>
           </el-row>
-          <el-row class="hide-box" v-show="!userLogin">
+          <el-row class="hide-box" v-show="userLogin">
             <h3>认证邮箱</h3>
             <p>在用户注册的时候，需要用您的企业邮箱来给用户发送激活信息，请确保您所填邮箱的有效性。若您不填写该项，将默认使用晶讯邮箱发送给用户激活信息。</p>
             <el-form :model="form" ref="form" label-width="100px" :rules="rules">
@@ -430,7 +491,7 @@ export default {
   name: '',
   data() { 
     return {
-      STEPNUM_1: 6,
+      STEPNUM_1: 7,
       introduceImg1: '', // 产品介绍图片
       introduceImg2: '',
       introduceImg3: '',
@@ -446,6 +507,14 @@ export default {
       privacyStatementUrl: '',
       tabRailingColor: '',
       backgroundColor: '',
+      /* 所有ui配置 */
+      configData: [],
+      uiIntroduceImgs: [],
+      uiOptions: [],
+      uiSelectValue: '', 
+      uiProductData: [], // 产品相关数据
+      uiOpenImgUrl: '', // 产品开图片
+      uiCloseImgUrl: '', // 产品关图片
       remoteService: false, // 支持远程服务
       controlSigMesh: false, // 支持控制SIG Mesh设备
       userLogin: false, // 支持用户免登陆
@@ -592,6 +661,10 @@ export default {
     // 获取OEM应用的风格设置
     if (this.active === 1 && this.active1 === 6) {
       this.getOEMStyle();
+    }
+    // 获取OEM 所有ui配置
+    if (this.active === 1 && this.active1 === 7) {
+      this.allUiConfig();
     }
     // 获取OEM应用的功能配置
     if (this.active === 2) {
@@ -829,6 +902,11 @@ export default {
         }
       })
     },
+    setSelectValue(item) {
+      console.log(item)
+      this.selectValue = item.productTypeId
+      this.showProductImg();
+    },
     // 产品开启图片上传
     productOpenImgUpload(response, file, fileList) {
       const openImg = response.data
@@ -992,6 +1070,73 @@ export default {
         // console.log(this.tabRailingColor, this.backgroundColor);
       })
     },
+    // 显示所有ui配置
+    allUiConfig() {
+      this.$axios.get('/oemApplication/ui').then((res) => {
+        const rs = res.data;
+        if (rs.success === true) {
+          // console.log(rs);
+          this.configData = rs.data;
+          console.log(this.configData);
+          this.uiIntroduceImgs = this.configData.introduceImg.split(';');
+          this.uiProductData = this.configData.productImgList;
+          this.uiProductData.forEach((item) => {
+            const obj = {}
+            obj.productTypeName = item.productTypeName;
+            obj.productTypeId = item.productTypeId;
+            this.uiOptions.push(obj);
+          })
+        }  
+      })
+    },
+    // 下载文件
+    downloadService() {
+
+    },
+    downloadPrivacyStatement() {
+
+    },
+    toStartImg() {
+      this.active = 1;
+      this.active1 = 2; 
+      this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
+    },
+    toIntroduceImg() {
+      this.active = 1;
+      this.active1 = 3; 
+      this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
+    },
+    toProductImg() {
+      this.active = 1;
+      this.active1 = 4; 
+      this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
+    },
+    toSetFile() {
+      this.active = 1;
+      this.active1 = 5; 
+      this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
+    },
+    toSetColor() {
+      this.active = 1;
+      this.active1 = 6; 
+      this.$cookies.set('active', this.active)
+      this.$cookies.set('active1', this.active1)
+    },
+    // 选择产品，显示对应图片
+    showUIProductImg() {
+      const { uiSelectValue } = this;
+      console.log(uiSelectValue);
+      this.uiProductData.forEach((item) => {
+        if (uiSelectValue === item.productTypeId) {
+          this.uiOpenImgUrl = item.openImg ? item.openImg : item.defaultOpenImg;
+          this.uiCloseImgUrl = item.closeImg ? item.closeImg : item.defaultCloseImg;
+        }
+      })
+    },
     // 获取OEM应用的功能配置
     getOemFunction() {
       this.$axios.get('/oemApplication/function').then((res) => {
@@ -1129,6 +1274,10 @@ export default {
         if (this.active1 === 6) {
           this.getOEMStyle();
         }
+        // 获取所有ui配置
+        if (this.active1 === 7) {
+          this.allUiConfig();
+        }
         // 保存当前的步骤
         this.$cookies.set('active', this.active)
         this.$cookies.set('active1', this.active1)
@@ -1187,6 +1336,10 @@ export default {
         // 获取OEM应用的风格设置
         if (this.active1 === 6) {
           this.getOEMStyle();
+        }
+        // 获取所有ui配置
+        if (this.active1 === 7) {
+          this.allUiConfig();
         }
         this.$cookies.set('active', this.active)
         return false;
@@ -1333,6 +1486,8 @@ export default {
                   height 40px
                   display inline-block
                   margin-top 5px
+                  background url('./imgs/bg.png') no-repeat
+                  backgtound-size 40px 40px
                 span 
                   margin-left 10px
             .oemStyle
@@ -1376,6 +1531,9 @@ export default {
               cursor pointer
               position relative
               overflow hidden
+              img
+                background url('./imgs/bg.png') no-repeat
+                backgtound-size 120px 120px
               &:hover 
                 border-color: #409EFF
               .product-upload-icon 
@@ -1416,7 +1574,51 @@ export default {
                 display inline-block
           p 
             font-size 18px
-            line-height 30px     
+            line-height 30px   
+      .config-wrapper
+        padding 20px 50px 0
+        button 
+          margin-right 20px
+        .config-item
+          margin-bottom 20px
+          padding-bottom 20px
+          border-bottom 1px dotted #ccc
+          &:last-child 
+            border-bottom none
+          .title
+            font-size 20px
+            font-weight 400
+            margin-right 20px
+          img 
+            width 200px 
+            height 150px
+            margin-right 10px
+            border 1px solid #ccc
+            vertical-align top
+        .product-img
+          .product-title
+            margin-bottom 20px
+          .img-box 
+            padding-left 200px   
+        .word
+          img 
+            width 26px     
+            height 31px
+            cursor pointer
+        .color-box
+          .color-item
+            margin  15px 95px
+            span:first-child
+              display inline-block
+              width 90px
+            span 
+              margin-right 20px
+            .color
+              display inline-block
+              width 20px
+              height 20px
+              border solid 1px #ccc
+              vertical-align middle        
     .create-app
       height 170px 
       text-align center 
