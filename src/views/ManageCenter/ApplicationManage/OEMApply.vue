@@ -37,7 +37,7 @@
         </div>
         <!-- 第二步： UI配置 -->
         <div class="step-container" v-show="active===1">
-          <div class="step1-0" v-show="active1===1">
+          <div class="logo-config" v-show="active1===1">
             <!-- 第一步 Logo设置 -->
             <el-row class="app-config" :gutter="50" type="flex">
               <el-col class="img-box">
@@ -48,10 +48,11 @@
                 </div>
               </el-col>
               <el-col class="cont">
-                <div>
-                  logo:
+                <div class="wrapper">
+                  <h3>logo</h3>
+                  <img src="./imgs/default.png" v-if="!logo"/>
+                  <img :src="logo" v-else />
                   <el-upload
-                    class="upload-demo"
                     action="/upload"
                     :show-file-list="false"
                     :on-exceed="logoHandleExceed"
@@ -68,7 +69,7 @@
               </el-col>
             </el-row>
           </div>
-          <div class="step1-1" v-show="active1===2">
+          <div class="startImg-config" v-show="active1===2">
             <!-- 第二步 启动图片设置 -->
             <el-row class="app-config" :gutter="50" type="flex">
               <el-col class="img-box">
@@ -78,10 +79,11 @@
                 </div>
               </el-col>
               <el-col class="cont">
-                <div>
-                  启动图片:
+                <div class="wrapper">
+                  <h3>启动图片</h3>
+                  <img src="./imgs/default.png" v-if="!startImg"/>
+                  <img :src="startImg" v-else />
                   <el-upload
-                    class="upload-demo"
                     action="/upload"
                     :show-file-list="false"
                     :on-exceed="logoHandleExceed"
@@ -98,7 +100,7 @@
               </el-col>
             </el-row>
           </div>
-          <div class="step1-2" v-show="active1===3">
+          <div class="introduceImg-config" v-show="active1===3">
             <!-- 第三步 app介绍图片 -->
             <el-row class="app-config" :gutter="50" type="flex">
               <el-col class="img-box">
@@ -117,49 +119,55 @@
                   </div>
                 </div>
               </el-col>
-              <el-col class="introduceImg-cont">
-                <div class="upload-wrapper">
-                  <div class="left">
-                    <h2>介绍图片:</h2>
+              <el-col class="cont">
+                <div class="wrapper">
+                  <div class="title">
+                    <span>介绍图片:</span>
                     <el-switch
                       v-model="useIntroduceImg"
                       :active-text="useIntroduceText"
                       @change="useIntroduceBtn">
                     </el-switch>
                   </div>
-                  <div class="right" v-show="useIntroduceImg">
-                    <el-upload
-                      class="upload-demo"
-                      ref="upload"
-                      action="/upload"
-                      :show-file-list="true"
-                      :on-exceed="logoHandleExceed"
-                      :on-success="introduceImgUpload_1"
-                      :limit="1">
-                      <el-button slot="trigger" size="small" type="primary">选择</el-button>
-                      <!-- <el-button size="small" type="success" @click="submitUpload">点击上传</el-button> -->
-                      <!-- <div slot="tip" class="el-upload__tip">只能上传png文件，且不超过5M</div> -->
-                    </el-upload>
-                    <el-upload
-                      class="upload-demo"
-                      ref="upload"
-                      action="/upload"
-                      :show-file-list="true"
-                      :on-exceed="logoHandleExceed"
-                      :on-success="introduceImgUpload_2"
-                      :limit="1">
-                      <el-button slot="trigger" size="small" type="primary">选择</el-button>
-                    </el-upload>
-                    <el-upload
-                      class="upload-demo"
-                      ref="upload"
-                      action="/upload"
-                      :show-file-list="true"
-                      :on-exceed="logoHandleExceed"
-                      :on-success="introduceImgUpload_3"
-                      :limit="1">
-                      <el-button slot="trigger" size="small" type="primary">选择</el-button>
-                    </el-upload>
+                  <div  class="introduceImg-list" v-show="useIntroduceImg">
+                    <div class="introduceImg-item">
+                      <el-upload
+                        ref="upload"
+                        list-type="picture"
+                        action="/upload"
+                        :show-file-list="true"
+                        :on-exceed="logoHandleExceed"
+                        :on-success="introduceImgUpload_1"
+                        :limit="1">
+                        <el-button slot="trigger" size="small" type="primary">选择</el-button>
+                        <!-- <el-button size="small" type="success" @click="submitUpload">点击上传</el-button> -->
+                        <!-- <div slot="tip" class="el-upload__tip">只能上传png文件，且不超过5M</div> -->
+                      </el-upload>
+                    </div>
+                    <div class="introduceImg-item">
+                      <el-upload
+                        ref="upload"
+                        list-type="picture"
+                        action="/upload"
+                        :show-file-list="true"
+                        :on-exceed="logoHandleExceed"
+                        :on-success="introduceImgUpload_2"
+                        :limit="1">
+                        <el-button slot="trigger" size="small" type="primary">选择</el-button>
+                      </el-upload>
+                    </div>
+                    <div class="introduceImg-item">
+                      <el-upload
+                        ref="upload"
+                        list-type="picture"
+                        action="/upload"
+                        :show-file-list="true"
+                        :on-exceed="logoHandleExceed"
+                        :on-success="introduceImgUpload_3"
+                        :limit="1">
+                        <el-button slot="trigger" size="small" type="primary">选择</el-button>
+                      </el-upload>
+                    </div>
                     <el-button slot="trigger" size="small" type="success" @click="introduceImgUpload">上传</el-button>
                   </div>
                 </div>
@@ -170,7 +178,7 @@
               </el-col>
             </el-row>
           </div>
-          <div class="step1-3" v-show="active1===4">
+          <div class="productImg-config" v-show="active1===4">
             <!-- 第四步 产品图片配置 -->
             <el-row class="app-config" :gutter="50" type="flex">
               <el-col class="img-box">
@@ -178,7 +186,7 @@
                   <img class="phone" src="./imgs/phone.jpg" alt="">
                   <div class="productList-wrapper">
                     <ul class="productList">
-                      <li class="productList-item" v-for="(item,index) in productData" :key="index">
+                      <li class="productList-item" v-for="(item) in productData" :key="item.productTypeName">
                         <img :src="item.openImg? item.openImg: item.defaultOpenImg" alt="" @click="setSelectValue(item)">
                         <span>{{item.productTypeName}}</span>
                       </li>
@@ -193,7 +201,7 @@
                   <el-select v-model="selectValue" @change="showProductImg" placeholder="请选择" clearable>
                     <el-option
                       v-for="item in options"
-                      :key="item.productTypeId"
+                      :key="item.productTypeName"
                       :label="item.productTypeName"
                       :value="item.productTypeId">
                     </el-option>
@@ -236,7 +244,7 @@
               </el-col>
             </el-row>
           </div>
-          <div class="step1-3" v-show="active1===5">
+          <div class="file-config" v-show="active1===5">
             <!-- 第五步 服务协议和隐私声明 -->
             <el-row class="app-config" :gutter="50" type="flex">
               <el-col class="img-box">
@@ -275,7 +283,7 @@
               </el-col>
             </el-row>
           </div>
-          <div class="step1-3" v-show="active1===6">
+          <div class="color-config" v-show="active1===6">
             <!-- 第六步 OEM应用的风格设置 -->
             <el-row class="app-config" :gutter="50" type="flex">
               <el-col class="img-box">
@@ -302,7 +310,7 @@
           </div>
           <div class="" v-show="active1===7">
             <!-- 第七步 显示所有ui配置 -->
-            <el-row class="config-wrapper">
+            <el-row class="allUI-config-wrapper">
               <div class="config-item">
                 <el-button type="primary" @click="toStartImg">修改</el-button>
                 <span class="title">启动图片:</span>
@@ -311,7 +319,7 @@
               <div class="config-item">
                 <el-button type="primary" @click="toIntroduceImg">修改</el-button>
                 <span class="title">介绍图片:</span>
-                <img :src="item" v-for="(item,index) in uiIntroduceImgs" :key="index" alt="">
+                <img :src="item" v-for="(item) in uiIntroduceImgs" :key="item.productTypeName" alt="">
               </div>
               <div class="config-item product-img">
                 <div class="product-title">
@@ -423,7 +431,18 @@
               <el-button type="primary" @click="createPackage">构建</el-button>
             </div>
             <div class="create-success" v-if="packageState===2">
-              <h3>构建成功</h3>
+              <h3>恭喜你，app已构建成功</h3>
+              <p>扫描下方二维码进行下载</p>
+              <div class="QRcode-box">
+                <div class="android">
+                  <h3>android</h3>
+                  <div id="android_QRCode" class="QRCode"></div>
+                </div>
+                <div class="ios">
+                  <h3>ios</h3>
+                  <div id="ios_QRCode" class="QRCode"></div>
+                </div>
+              </div>
             </div>
             <div class="create-info" v-if="packageState===1">
               <h3>您的app还在构建中，请耐心等待，感谢您的理解</h3>
@@ -485,7 +504,7 @@ import { mapState } from 'vuex'
 import 'swiper/dist/css/swiper.min.css'
 import Swiper from 'swiper/dist/js/swiper'
 import BScroll from 'better-scroll'
-
+import QRCode from 'qrcodejs2'
 
 export default {
   name: '',
@@ -825,7 +844,7 @@ export default {
     useIntroduceBtn() {
       const { useIntroduceImg } = this;
       this.$store.commit('useIntroduceImg', { useIntroduceImg })
-      console.log(this.useIntroduceImg);
+      console.log(useIntroduceImg);
     },
     // 上传介绍图片成功后， 修改介绍图片
     // 三张图片分开上传
@@ -1199,6 +1218,24 @@ export default {
         const rs = res.data;
         console.log(rs);
         this.packageState = rs.data.packageState;
+        this.qrcode()
+      })
+    },
+    // 二维码
+    qrcode() {
+      let androidQRCode = new QRCode('android_QRCode', {
+        width: 132,  
+        height: 132,
+        text: 'https://www.baidu.com',
+        colorDark: '#000',
+        colorLight: '#fff',
+      })
+      let iosQRCode = new QRCode('ios_QRCode', {
+        width: 132,  
+        height: 132,
+        text: 'https://www.baidu.com',
+        colorDark: '#000',
+        colorLight: '#fff',
       })
     },
     // 构建OEM应用
@@ -1333,10 +1370,6 @@ export default {
       }
       if (this.active === 2) {
         this.active = 1;
-        // 获取OEM应用的风格设置
-        if (this.active1 === 6) {
-          this.getOEMStyle();
-        }
         // 获取所有ui配置
         if (this.active1 === 7) {
           this.allUiConfig();
@@ -1367,7 +1400,10 @@ export default {
         if (this.active1 === 5) {
           this.getAgreementAndStatement();
         }
-        
+        // 获取OEM应用的风格设置
+        if (this.active1 === 6) {
+          this.getOEMStyle();
+        }
         if (this.active1 < 1) {
           this.active = 0;
           this.active1 = 0;
@@ -1546,9 +1582,7 @@ export default {
               .icon 
                 width 120px
                 height 120px
-                display block
-          div 
-           margin-bottom 30px   
+                display block  
           p 
             font-size 18px
             line-height 30px 
@@ -1560,22 +1594,67 @@ export default {
             cursor pointer
         .oemStyle
           padding-top 20px    
-        .introduceImg-cont
-          font-size 22px
-          text-align left 
-          .upload-wrapper
-            display flex
+      /* logo设置 */         
+      .logo-config
+        .cont 
+          .wrapper
+            width 200px
+            text-align center
             margin-bottom 30px
-            .left 
-              width 120px
-            .right
-              flex 1
-              .upload-demo
-                display inline-block
-          p 
-            font-size 18px
-            line-height 30px   
-      .config-wrapper
+          img
+            margin 15px 0
+            display inline-block
+            width 140px
+            height 140px
+            border 1px solid #ccc
+      /* 启动图片设置 */      
+      .startImg-config
+        .cont 
+          .wrapper
+            width 200px
+            text-align center
+            margin-bottom 30px
+          img
+            margin 15px 0
+            display inline-block
+            width 120px
+            height 180px  
+            border 1px solid #ccc
+      /* 介绍图片设置 */   
+      .introduceImg-config
+        .cont 
+          text-align left 
+          .wrapper
+            width 300px
+            margin-bottom 30px
+            .title
+              height 40px
+              line-height 40px
+              .el-switch 
+                vertical-align middle
+                margin-left 20px
+            .introduceImg-list
+              .introduceImg-item 
+                margin-bottom 20px
+          img
+            margin 15px 0
+            display inline-block
+            width 120px
+            height 180px  
+            border 1px solid #ccc
+      /* 产品图片设置 */
+      .productImg-config
+        div 
+          margin-bottom 30px
+      /* 服务协议设置 */
+      .file-config
+        div 
+          margin-bottom 30px
+      /* 风格设置 */
+      .color-config
+        div 
+          margin-bottom 30px
+      .allUI-config-wrapper
         padding 20px 50px 0
         button 
           margin-right 20px
@@ -1649,7 +1728,23 @@ export default {
       text-align center  
       h3 
         font-size 18px
-        margin 50px 0  
+        margin 20px 0  
+      .create-success
+        .QRcode-box
+          width 400px
+          margin 0 auto
+          display flex  
+          padding-top 20px
+          .android
+            flex 1
+          .ios
+            flex 1
+          .QRCode
+            display inline-block
+            width 132px
+            height 132px
+            background-color #fff
+            padding 6px
     .publish-box
       margin-left 200px
       .publish,.publish-info,.publish-success
