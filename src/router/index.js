@@ -101,10 +101,40 @@ const router = new Router({
         {
           path: 'productManage',
           name: 'productManage',
+          redirect: '/manageCenter/productManage/product', 
           component: resolve => require(['views/ManageCenter/ProductManage/ProductManage'], resolve),
           meta: {
             hideHeader: true
-          }
+          },
+          children: [
+            { path: 'product', 
+              name: 'product',
+              component: resolve => require(['views/ManageCenter/ProductManage/Product'], resolve),
+              meta: {
+                hideHeader: true,
+                showProductMenu: true,
+                activeMenu: '/manageCenter/productManage'
+              }
+            },
+            { path: 'accessories', 
+              name: 'accessories',
+              component: resolve => require(['views/ManageCenter/ProductManage/TMAccessories'], resolve),
+              meta: {
+                hideHeader: true,
+                showProductMenu: true,
+                activeMenu: '/manageCenter/productManage'
+              }
+            },
+            { path: 'createProduct', 
+              name: 'createProduct',
+              component: resolve => require(['views/ManageCenter/ProductManage/CreateProduct'], resolve),
+              meta: {
+                hideHeader: true,
+                showProductMenu: false,
+                activeMenu: '/manageCenter/productManage'
+              }
+            },
+          ]
         },
         {
           path: 'valueService',

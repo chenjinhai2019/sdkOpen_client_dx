@@ -430,18 +430,18 @@
               <h3>构建app需要一定的时间，请耐心等待</h3>
               <el-button type="primary" @click="createPackage">构建</el-button>
             </div>
-            <div class="create-success" v-if="packageState===2">
+            <div class="create-success">
               <h3>恭喜你，app已构建成功</h3>
               <p>扫描下方二维码进行下载</p>
               <div class="QRcode-box">
                 <div class="android">
-                  <h3>android</h3>
+                  <!-- <h3>android</h3> -->
                   <div id="android_QRCode" class="QRCode"></div>
                 </div>
-                <div class="ios">
+                <!-- <div class="ios">
                   <h3>ios</h3>
                   <div id="ios_QRCode" class="QRCode"></div>
-                </div>
+                </div> -->
               </div>
             </div>
             <div class="create-info" v-if="packageState===1">
@@ -1223,10 +1223,11 @@ export default {
     },
     // 二维码
     qrcode() {
+      document.getElementById('android_QRCode').innerHTML = '';
       let androidQRCode = new QRCode('android_QRCode', {
         width: 132,  
         height: 132,
-        text: 'https://www.baidu.com',
+        text: 'https://webzyh.github.io/autoDownload/index.html',
         colorDark: '#000',
         colorLight: '#fff',
       })
