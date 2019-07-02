@@ -4,7 +4,7 @@
       <ul class="product-list">
         <li class="add-btn" @click="createProduct($event)">+</li>
         <li class="item" v-for="(item,index) in productLists" :key="index"  @click="createProduct($event,item.id)">
-          <i @click="deleteProduct">×</i>
+          <i @click.stop="deleteProduct(item.id)">×</i>
           <div>产品名: {{item.name}}</div>
           <div>状态： {{item.state}}</div>
           <div>创建时间: {{item.createTime}}</div>
@@ -24,6 +24,7 @@ export default {
   data() { 
     return {
       productLists: [],
+      id: '',
     }
   },
   created() {
@@ -36,7 +37,7 @@ export default {
         currentPage: 1,
         pageSize: 100
       }
-      this.$axios.get('/product', { params }).then((res) => {
+      this.$axios.get('/product/v1', { params }).then((res) => {
         const rs = res.data;
         console.log(rs);
         this.productLists = rs.data.list;
@@ -63,15 +64,20 @@ export default {
       this.$router.push({ name: 'createProduct', query: { id } })
     },
     // 删除产品
-    deleteProduct() {
+    deleteProduct(id) {
       this.$confirm('是否删除该产品？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message.success('删除成功')
+        this.$axios.delete(`/product/v1/${id}`).then((res) => {
+          if (res.data.success === true) {
+            this.$message.success('删除成功')
+            this.initProductList();
+          }
+        })
       }).catch(() => {
-        // 取消
+        // 点击取消
       })
     }
   }

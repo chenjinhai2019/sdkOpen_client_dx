@@ -123,6 +123,7 @@ export default {
       font-size 26px
       color #fff
       margin-bottom 20px
+      text-align center
     .el-input 
       margin-bottom 20px  
     .link-wrapper

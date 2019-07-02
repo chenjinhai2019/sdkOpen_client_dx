@@ -252,7 +252,7 @@ export default {
             // console.log(rs);
             if (rs.success === true) {
               this.id = rs.data.id;
-              this.$router.push({ name: 'createSDK', query: { id: rs.data.id } })
+              this.$router.replace({ name: 'createSDK', query: { id: rs.data.id } })
               this.$message.success('申请成功')
             } else {
               this.$message.error('申请失败') 
