@@ -14,5 +14,5 @@ export default{
   active: Cookies.get('active') ? parseInt(Cookies.get('active'), 10) : 0,
   active1: Cookies.get('active1') ? parseInt(Cookies.get('active1'), 10) : 0,
   introduceImgs: '',
-  useIntroduceImg: false
+  useIntroduceImg: false,
 }

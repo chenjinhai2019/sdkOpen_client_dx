@@ -55,5 +55,6 @@ export default{
   // 是否开启介绍图片
   useIntroduceImg(state, { useIntroduceImg }) {
     state.useIntroduceImg = useIntroduceImg
-  }
+  },
+
 }

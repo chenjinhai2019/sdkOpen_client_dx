@@ -50,7 +50,7 @@
           <h2>产品基本信息：</h2>
           <div class="product-info">
             <div class="left">
-              <img :src="productInfo.img" alt="">
+              <img :src="productInfo.img" alt="" class="product-img">
             </div>
             <div class="right">
                 <div class="item">
@@ -85,9 +85,9 @@
           </div>
           <h2>产品功能：</h2>
           <div class="product-func">
-            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="checkAllChange">全选</el-checkbox>
-            <el-checkbox-group v-model="checkedFunc" @change="checkedFuncChange">
-              <el-checkbox v-for="item in this.funcOptions" :label="item" :key="item">{{item}}</el-checkbox>
+            <el-checkbox v-model="checkAll" @change="checkAllChange">全选</el-checkbox>
+            <el-checkbox-group v-model="checkedFunc">
+              <el-checkbox v-for="item in this.productFuncLists" :label="item.name" :key="item.name" @change="checkedFuncChange(item)">{{item.name}}</el-checkbox>
             </el-checkbox-group>
             <el-row>
               <el-table :data="funcTable" style="width: 100%" border>
@@ -113,19 +113,34 @@
                 ></el-table-column>
                 <el-table-column
                   label="参数定义"
-                  prop="paramDefinitionName"
                   align="center"
-                ></el-table-column>
+                >
+                  <template slot-scope="scope">
+                    <div v-for="item in scope.row.paramList" :key="item.name">{{item.name}} {{item.data}}</div>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   label="操作"
                   align="center"
                 >
                   <template slot-scope="scope">
-                    <el-button>编辑</el-button>
+                    <el-button type="text" @click="changeParams(scope.row)">编辑</el-button>
                   </template>
                 </el-table-column>
               </el-table>
             </el-row>
+            <el-dialog
+              title="编辑功能"
+              :visible.sync="dialogVisible"
+              width="30%">
+              <el-row>
+                <el-col></el-col>
+              </el-row>
+              <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+              </span>
+            </el-dialog>
           </div>
         </div>
         <div class="step-container" v-show="productActive===2">
@@ -159,7 +174,7 @@ export default {
         comunicationType: ''
       },
       productInfo: {},
-      id: parseInt(this.$route.query.id, 10) || '',
+      id: parseInt(this.$route.query.id, 10) || '', // 产品id
       productTypeLists: [],
       textareaValue: '',
       productInfoRules: {
@@ -176,14 +191,20 @@ export default {
           { required: true, message: '请选择网络类型', trigger: 'change' }
         ],
       },
+      productFuncLists: [], // 产品默认的功能
       funcOptions: [],
-      checkAll: false,
-      checkedFunc: [], // 已选中的功能
-      isIndeterminate: false,
+      checkedFunc: [], // 用户已选择的功能
       funcTable: [], // 功能表格数据
+      dialogVisible: false,
     }
   },
   computed: {
+    checkAll: {
+      get() {
+        return this.funcOptions.length === this.checkedFunc.length;
+      },
+      set() {},
+    },
     prevText() {
       return this.productActive === 0 ? '返回' : '上一步';
     },
@@ -195,7 +216,8 @@ export default {
     }
     if (this.productActive === 1) {
       this.getProductInfo();
-      this.getProductDefaultPower();
+      this.getProductDefaultPower(); // 获取产品类型的所有功能
+      this.getProductPower(); // 获取产品已设置的功能
     }
   },
   methods: {
@@ -227,7 +249,7 @@ export default {
             productInfoForm.comunicationType = rs.comunicationType;
             this.textareaValue = rs.describtion;
             this.productInfo = rs;
-            console.log(this.productInfo);
+            // console.log(this.productInfo);
           }
         })
       }
@@ -288,9 +310,11 @@ export default {
           this.$axios.patch(`/product/v1/${this.id}/baseinfo`, params).then((res) => {
             if (res.data.success === true) {
               this.productActive = 1;
-              this.$router.replace({ name: 'createProduct', query: { id: this.id, typeId: productInfoForm.typeId } })
-              this.getProductDefaultPower();
+              this.$cookies.set('typeId', productInfoForm.typeId);
               this.$cookies.set('productActive', 1);
+              this.getProductInfo();
+              this.getProductDefaultPower(); // 获取产品类型的所有功能
+              this.getProductPower(); // 获取产品已设置的功能
             }
           })
         }
@@ -298,30 +322,80 @@ export default {
     },
     // 获取产品默认功能
     getProductDefaultPower() {
-      const productTypeId = this.$route.query.typeId;
+      const productTypeId = this.$cookies.get('typeId');
       this.$axios.get(`/commonProduct/${productTypeId}/defaultPower`).then((res) => {
         const rs = res.data;
         if (rs.success === true) {
-          this.productFuncLists = rs.data;
-          // 将产品所有的功能名放入一个数组中，供复选框使用
-          this.productFuncLists.forEach((item) => {
-            this.funcOptions.push(item.name);
+          this.productFuncLists = rs.data; // 返回的原数据，包含所有返回的数据
+          this.funcOptions = []; // 每次插入数据前清空数组 ***
+          this.productFuncLists.forEach((item) => { 
+            this.funcOptions.push(item.name); // 所有的功能名称
           })
-          console.log(this.productFuncLists);
-          console.log(this.funcOptions);
+          // console.log(this.productFuncLists);
+          // console.log(this.funcOptions);
         }
       })
     },
     // 产品功能全选
     checkAllChange(val) {
       this.checkedFunc = val ? this.funcOptions : [];
-      this.isIndeterminate = false;
+      console.log(val);
     },
-    checkedFuncChange(value) {
-      let checkedCount = value.length;
-      this.checkAll = checkedCount === this.funcOptions.length;
-      this.isIndeterminate = checkedCount > 0 && checkedCount < this.funcOptions.length;
+    // 产品功能选择
+    checkedFuncChange(item) {
+      // console.log(item);
+      let checkedCount = this.funcOptions.length; // 所有功能的个数
+      this.checkAll = checkedCount === this.checkedFunc.length; // 当前选择的个数
+      // console.log(checkedCount);
+      // console.log(this.checkedFunc.length);
+      // console.log(this.checkAll);
+      const id = this.id; // 产品id
+      const params = this.$qs.stringify({
+        powerId: item.id, // 默认功能id
+      })
+      this.$axios.post(`/commonProduct/${id}/power`, params).then((res) => {
+        if (res.data.success === true) {
+          this.$message.success('修改成功');
+          this.getProductPower(); // 表格初始化
+        }
+      })
     },
+    // 获取普通产品的功能配置，表格初始化
+    getProductPower() {
+      this.$axios.get(`/commonProduct/${this.id}/power`).then((res) => {
+        const rs = res.data;
+        this.funcTable = rs.data; // 复选框选择后的数据数组
+        // console.log(this.funcTable);  
+        this.checkedFunc = []; // 用户选择的功能名称数组
+        this.funcTable.forEach((item) => {
+          // 数据处理
+          if (item.transferType === 1) {
+            item.transferType = '上报';
+          } else if (item.transferType === 2) {
+            item.transferType = '下发';
+          } else if (item.transferType === 3) {
+            item.transferType = '上报下发';
+          }
+          if (item.dataType === 1) {
+            item.dataType = '整数';
+          } else if (item.dataType === 2) {
+            item.dataType = '布尔';
+          } else if (item.dataType === 3) {
+            item.dataType = '枚举';
+          } else if (item.dataType === 4) {
+            item.dataType = '字符串';
+          }
+          this.checkedFunc.push(item.name);
+        })
+        // console.log(this.checkedFunc);
+      })
+    },
+    // 修改普通产品的功能配置的参数定义
+    changeParams(args) {
+      this.dialogVisible = true;
+      console.log(args);
+    },
+
     // 下一步
     next() {
       if (this.productActive === 0) {
@@ -390,13 +464,13 @@ export default {
       .product-info
         font-size 14px
         display flex
-        padding 0 20px
+        padding 10px 20px
         border-bottom 1px solid #ccc
         .left 
           flex 1
-          img 
+          .product-img
             width 150px
-            margin-top 20px
+            background url('./imgs/bg.png') no-repeat
         .right 
           flex 3   
           display flex
