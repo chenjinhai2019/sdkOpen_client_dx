@@ -143,8 +143,49 @@
             </el-dialog>
           </div>
         </div>
-        <div class="step-container" v-show="productActive===2">
-          333
+        <div class="step-container module-select-wrap" v-show="productActive===2">
+          <div class="select-module">
+            <div class="title">选用模块: {{moduleNumber}}</div>
+            <div class="box">
+              <div class="left">
+                <img src="./imgs/img1.jpg" alt="">
+                <div>
+                  <p>型号</p>
+                  <p>{{moduleNumber}}</p>
+                </div>
+              </div>
+              <div class="right">
+                <span>电路参考图：</span>
+                <img src="./imgs/img2.jpg" alt="">
+              </div>
+            </div>
+          </div>
+          <!-- 硬件配置 -->
+          <div class="hardware-config-wrap">
+            <h2>硬件配置：</h2>
+            <div class="hardware-config">
+              <div class="type-set-box">
+                <div class="type-box mt20">
+                  <span>类型设置： </span>
+                  <el-select v-model="typeSetValue" placeholder="请选择">
+                    <el-option v-for="item in typeSetOptions" :key="item.label" :value="item.value" :label="item.label"></el-option>
+                  </el-select>
+                </div>
+                <div class="pwm-box mt20">
+                  <span>PWM设置：</span>
+                  <el-input v-model="PWMValue" maxlength="3"></el-input> KHz
+                  <span style="margin-left: 30px">0.5-20KHz</span>
+                </div>
+                <div class="gpio-box mt20">
+                  <span>PWM GPIO设置：</span>
+                </div>
+              </div>
+              <h3>语音设置</h3>
+            </div>
+            <div class="">
+              
+            </div>
+          </div>
         </div>
         <div class="step-container" v-show="productActive===3">
           444
@@ -196,6 +237,27 @@ export default {
       checkedFunc: [], // 用户已选择的功能
       funcTable: [], // 功能表格数据
       dialogVisible: false,
+      moduleNumber: '', // 模块型号
+      typeSetValue: '',
+      typeSetOptions: [
+        {
+          value: '1',
+          label: '单路'
+        },
+        {
+          value: '2',
+          label: '双路'
+        },
+        {
+          value: '4',
+          label: '四路'
+        },
+        {
+          value: '5',
+          label: '五路'
+        },
+      ],
+      PWMValue: '',
     }
   },
   computed: {
@@ -218,6 +280,10 @@ export default {
       this.getProductInfo();
       this.getProductDefaultPower(); // 获取产品类型的所有功能
       this.getProductPower(); // 获取产品已设置的功能
+    }
+    if (this.productActive === 2) {
+      // 获取普通产品的模块配置信息
+      this.getModuleInfo();
     }
   },
   methods: {
@@ -395,6 +461,16 @@ export default {
       this.dialogVisible = true;
       console.log(args);
     },
+    // 获取普通产品的模块配置信息
+    getModuleInfo() {
+      this.$axios.get(`/commonProduct/${this.id}/module`).then((res) => {
+        const rs = res.data;
+        if (rs.success === true) {
+          console.log(rs);
+          this.moduleNumber = rs.data.moduleNumber;
+        }
+      })
+    },
 
     // 下一步
     next() {
@@ -403,16 +479,21 @@ export default {
       }
       if (this.productActive === 1) {
         this.productActive = 2;
+        this.getModuleInfo();
         this.$cookies.set('productActive', 2)
+        return false;
       }
-      if (this.productActive > 2) {
-        this.productActive = 2
+      if (this.productActive === 2) {
+        this.productActive = 3
       }
     },
     // 上一步
     prev() {
       if (this.productActive === 2) {
         this.productActive = 1;
+        this.getProductInfo();
+        this.getProductDefaultPower(); // 获取产品类型的所有功能
+        this.getProductPower(); // 获取产品已设置的功能
         this.$cookies.set('productActive', this.productActive);
         return false;
       }
@@ -432,11 +513,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.mt20
+  margin-bottom 20px
 .create-product
   margin 0 auto
   .step-containers
     width 80%
     margin 30px auto 0
+    /* 产品基本信息 */
     .product-info-wrap
       h2  
         font-size 20px
@@ -456,6 +540,7 @@ export default {
             line-height 40px
             color #606266
             margin-bottom 10px
+    /* 产品功能 */        
     .product-func-wrap
       h2  
         font-size 18px
@@ -494,6 +579,38 @@ export default {
           margin-bottom 20px  
         .el-checkbox-group 
           margin-bottom 10px
+    /* 模块选择 */
+    .module-select-wrap
+      /* 选用模块 */
+      .select-module
+        border-bottom 1px solid #ccc
+        padding 20px
+        .title
+          font-size 18px
+          margin-bottom 20px
+        .box
+          display flex
+          .left 
+            flex 1
+            display flex
+            img
+              margin-right 20px
+          .right 
+            flex 1  
+            img 
+              vertical-align top
+      /* 硬件配置 */
+      .hardware-config-wrap
+        padding 20px
+        h2 
+         font-size 18px
+         height 40px
+         line-height 40px
+        .hardware-config
+          .pwm-box
+            .el-input
+              width 50px 
+
 .button-box
   margin-top 50px
   text-align right
