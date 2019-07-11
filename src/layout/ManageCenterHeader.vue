@@ -17,9 +17,25 @@
         <div class="link-box">
           <router-link to="/developDoc" class="developdoc"><i class="fa fa-file-text-o" aria-hidden="true"></i> 开发文档</router-link>
         </div>
-        <div class="welcome-wrap">
-          <div class="welcome">hello,{{username}}</div>
-        </div>
+        <el-dropdown class="welcome-container" trigger="hover" placement="top">
+            <div class="welcome-wrap">
+              <div class="welcome">hello,{{username}}</div>
+            </div>
+            <el-dropdown-menu slot="dropdown">
+              <router-link to="/subaccountManage">
+                <el-dropdown-item>管理</el-dropdown-item>
+              </router-link>
+              <router-link to="/operateLog">
+                <el-dropdown-item>日志</el-dropdown-item>
+              </router-link>
+              <router-link to="/subscribe">
+                <el-dropdown-item>订阅</el-dropdown-item>
+              </router-link>
+              <el-dropdown-item divided>
+                <span @click="logout">退出</span>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
       </el-col>
     </el-row>
   </el-header>
@@ -50,6 +66,11 @@ export default {
   },
   mounted() {
     
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch('removeUserInfo', this.$router);
+    },
   }
 }
 </script>
@@ -84,6 +105,8 @@ export default {
         a:hover 
           color #333
       .welcome-wrap
-       margin 0 30px
-       padding-top 2px
+        margin 0 30px
+        padding-top 2px
+        .welcome
+          cursor pointer
 </style>

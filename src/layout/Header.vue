@@ -48,6 +48,7 @@
 </template>
 <script>
 import { mapState } from 'vuex'
+import { clearCookie } from '../libs/common'
 
 export default {
   data() {
@@ -87,24 +88,30 @@ export default {
       if (this.username) {
         this.$axios.get('/userinfo/company').then((res) => {
           const rs = res.data;
-          let certifyState = rs.data.state;
+          if (rs.success === true) {
+            let certifyState = rs.data.state;
 
-          // 存vuex
-          this.$store.commit('certify_state', { certifyState })
-          // console.log(certifyState);
-          if (certifyState === -1) {
-            this.$router.push('/corporateCertify')
-          } else if (certifyState === 0) {
-            this.$msgbox({
-              title: '提示',
-              message: '您的企业认证信息还在审核中，审核结果会通过邮件告知，请留意您的邮箱。',
-              type: 'success',
-              showClose: false,
-              confirmButtonText: '确定',
-              closeOnClickModal: false,
-            })
-          } else if (certifyState === 1) {
-            this.$router.push('/manageCenter');
+            // 存vuex
+            this.$store.commit('certify_state', { certifyState })
+            // console.log(certifyState);
+            if (certifyState === -1) {
+              this.$router.push('/corporateCertify')
+            } else if (certifyState === 0) {
+              this.$msgbox({
+                title: '提示',
+                message: '您的企业认证信息还在审核中，审核结果会通过邮件告知，请留意您的邮箱。',
+                type: 'success',
+                showClose: false,
+                confirmButtonText: '确定',
+                closeOnClickModal: false,
+              })
+            } else if (certifyState === 1) {
+              this.$router.push('/manageCenter');
+            }
+          } else {
+            /* this.$message.error('状态异常，请重新登录');
+            clearCookie();
+            this.$router.replace('/login'); */
           }
         });
       } else {

@@ -131,7 +131,7 @@
                   </div>
                   <div  class="introduceImg-list" v-show="useIntroduceImg">
                     <div class="introduceImg-item">
-                      <el-upload
+                      <!-- <el-upload
                         ref="upload"
                         list-type="picture"
                         action="/upload"
@@ -140,12 +140,21 @@
                         :on-success="introduceImgUpload_1"
                         :limit="1">
                         <el-button slot="trigger" size="small" type="primary">选择</el-button>
-                        <!-- <el-button size="small" type="success" @click="submitUpload">点击上传</el-button> -->
-                        <!-- <div slot="tip" class="el-upload__tip">只能上传png文件，且不超过5M</div> -->
+                        <!-- <el-button size="small" type="success" @click="submitUpload">点击上传</el-button>
+                        <div slot="tip" class="el-upload__tip">只能上传png文件，且不超过5M</div> 
+                      </el-upload>-->
+                      <el-upload
+                        class="introduceImg-uploader"
+                        action="/upload"
+                        :show-file-list="false"
+                        :before-upload="beforeStartImgUpload"
+                        :on-success="introduceImgUpload_1">
+                        <img v-if="introduceImg1" :src="introduceImg1" class="introduceImg">
+                        <i v-else class="el-icon-plus introduceImg-uploader-icon"></i>
                       </el-upload>
                     </div>
                     <div class="introduceImg-item">
-                      <el-upload
+                      <!-- <el-upload
                         ref="upload"
                         list-type="picture"
                         action="/upload"
@@ -154,10 +163,19 @@
                         :on-success="introduceImgUpload_2"
                         :limit="1">
                         <el-button slot="trigger" size="small" type="primary">选择</el-button>
+                      </el-upload> -->
+                      <el-upload
+                        class="introduceImg-uploader"
+                        action="/upload"
+                        :show-file-list="false"
+                        :before-upload="beforeStartImgUpload"
+                        :on-success="introduceImgUpload_2">
+                        <img v-if="introduceImg2" :src="introduceImg2" class="introduceImg">
+                        <i v-else class="el-icon-plus introduceImg-uploader-icon"></i>
                       </el-upload>
                     </div>
                     <div class="introduceImg-item">
-                      <el-upload
+                      <!-- <el-upload
                         ref="upload"
                         list-type="picture"
                         action="/upload"
@@ -166,10 +184,19 @@
                         :on-success="introduceImgUpload_3"
                         :limit="1">
                         <el-button slot="trigger" size="small" type="primary">选择</el-button>
+                      </el-upload> -->
+                      <el-upload
+                        class="introduceImg-uploader"
+                        action="/upload"
+                        :show-file-list="false"
+                        :before-upload="beforeStartImgUpload"
+                        :on-success="introduceImgUpload_3">
+                        <img v-if="introduceImg3" :src="introduceImg3" class="introduceImg">
+                        <i v-else class="el-icon-plus introduceImg-uploader-icon"></i>
                       </el-upload>
                     </div>
-                    <el-button slot="trigger" size="small" type="success" @click="introduceImgUpload">上传</el-button>
                   </div>
+                  <el-button v-show="useIntroduceImg" slot="trigger" size="small" type="success" @click="introduceImgUpload">上传</el-button>
                 </div>
                 <p>用于让用户更多的了解你的应用，若你不想添加介绍内容，可选择禁用</p>
                 <p>分辨率：1242*2808</p>
@@ -197,7 +224,7 @@
               <el-col class="cont">
                 <div>
                   <!--  -->
-                  产品类型：  
+                  <span class="title">产品类型：</span>
                   <el-select v-model="selectValue" @change="showProductImg" placeholder="请选择" clearable>
                     <el-option
                       v-for="item in options"
@@ -215,6 +242,7 @@
                         class="product-upload"
                         action="/upload"
                         :show-file-list="false"
+                        :before-upload="beforeProductImgUpload"
                         :on-success="productOpenImgUpload">
                         <img v-if="openImgUrl" :src='openImgUrl' class="icon">
                         <i v-else class="el-icon-plus product-upload-icon"></i>
@@ -229,6 +257,7 @@
                         class="product-upload"
                         action="/upload"
                         :show-file-list="false"
+                        :before-upload="beforeProductImgUpload"
                         :on-success="productCloseImgUpload">
                         <img v-if="closeImgUrl" :src='closeImgUrl' class="icon">
                         <i v-else class="el-icon-plus product-upload-icon"></i>
@@ -295,11 +324,18 @@
                   </div>
                 </div>
               </el-col>
-              <el-col class="cont oemStyle">
+              <el-col class="cont oemColorStyle">
                 <!-- 颜色取色器 -->
                 <div class="block">
                   <div class="demonstration">tab颜色设置</div>
                   <el-color-picker v-model="tabRailingColor" @change="setOEMStyle"></el-color-picker>
+                  <div class="color-group">
+                    <span style="background: red"></span>
+                    <span style="background: orange"></span>
+                    <span style="background: yellow"></span>
+                    <span style="background: green"></span>
+                    <span style="background: blue"></span>
+                  </div>
                 </div>
                 <div class="block">
                   <div class="demonstration">背景颜色设置</div>
@@ -430,7 +466,7 @@
               <h3>构建app需要一定的时间，请耐心等待</h3>
               <el-button type="primary" @click="createPackage">构建</el-button>
             </div>
-            <div class="create-success">
+            <div class="create-success" v-if="packageState===2">
               <h3>恭喜你，app已构建成功</h3>
               <p>扫描下方二维码进行下载</p>
               <div class="QRcode-box">
@@ -511,9 +547,6 @@ export default {
   data() { 
     return {
       STEPNUM_1: 7,
-      introduceImg1: '', // 产品介绍图片
-      introduceImg2: '',
-      introduceImg3: '',
       selectValue: '', // select选项值
       options: [], // select选项数据
       productData: [], // 产品数据
@@ -602,6 +635,30 @@ export default {
     },
     // 获取OEM应用对象，没有时为null
     ...mapState(['oemApplication', 'originAppName', 'originAppPackName', 'originAppVersion', 'logo', 'startImg', 'introduceImgs']), 
+    introduceImg1: {
+      get() {
+        return this.$store.state.introduceImg1
+      },
+      set(val) {
+        this.$store.state.introduceImg1 = val;
+      }
+    },
+    introduceImg2: {
+      get() {
+        return this.$store.state.introduceImg2
+      },
+      set(val) {
+        this.$store.state.introduceImg2 = val;
+      }
+    },
+    introduceImg3: {
+      get() {
+        return this.$store.state.introduceImg3
+      },
+      set(val) {
+        this.$store.state.introduceImg3 = val;
+      }
+    },
     appName: {
       get() {
         return this.oemApplication ? this.oemApplication.appName : ''
@@ -770,7 +827,18 @@ export default {
       console.log(file)
       const isPNG = file.type === 'image/png';
       const limit5M = file.size / 1024 / 1024 < 5;
-      const isSize = new Promise((resolve, reject) => {
+      let isSize = false;
+      let width = 1024;
+      let height = 1024;
+      let img = new Image();
+      img.onload = function () {
+        if (img.width === width && img.height === height) {
+          isSize = true;
+        } else {
+          isSize = false;
+        }
+      }
+      /* const isSize = new Promise((resolve, reject) => {
         let width = 1024;
         let height = 1024;
         let _URL = window.URL || window.webkitURL;
@@ -784,9 +852,13 @@ export default {
         return file;
       }, () => {
         this.$message.error('图片尺寸限制为1024*1024')
-      })
+      }) */
+      console.log(isSize);
       if (!isPNG) {
         this.$message.error('上传头像图片只能是png格式');
+      } 
+      if (!isSize) {
+        this.$message.error('图片尺寸限制为1024*1024');
       }
       if (!limit5M) {
         this.$message.error('上传头像图片大小不能超过5MB');
@@ -815,9 +887,33 @@ export default {
     getStartImg() {
       this.$store.dispatch('getStartImg');
     },
-    // 检查上传logo是否符合要求
-    beforeStartImgUpload() {
-
+    // 检查上传启动图片是否符合要求
+    beforeStartImgUpload(file) {
+      // debugger;
+      console.log(file)
+      const isPNG = file.type === 'image/png';
+      const limit5M = file.size / 1024 / 1024 < 5;
+      let isSize = false;
+      let width = 1024;
+      let height = 1024;
+      let img = new Image();
+      img.onload = function () {
+        if (img.width === width && img.height === height) {
+          isSize = true;
+        } else {
+          isSize = false;
+        }
+      }
+      if (!isSize) {
+        this.$message.error('图片尺寸限制为1242*2808');
+      }
+      if (!isPNG) {
+        this.$message.error('上传图片只能是png格式');
+      }
+      if (!limit5M) {
+        this.$message.error('上传图片大小不能超过5MB');
+      }
+      return isSize && isPNG && limit5M;
     },
     // 上传启动图片成功， 修改启动图片
     startImgUpload(response, file, fileList) {
@@ -925,6 +1021,32 @@ export default {
       console.log(item)
       this.selectValue = item.productTypeId
       this.showProductImg();
+    },
+    // 检查上传产品图片是否符合要求
+    beforeProductImgUpload(file) {
+      const isPNG = file.type === 'image/png';
+      const limit5M = file.size / 1024 / 1024 < 5;
+      let isSize = false;
+      let width = 200;
+      let height = 200;
+      let img = new Image();
+      img.onload = function () {
+        if (img.width === width && img.height === height) {
+          isSize = true;
+        } else {
+          isSize = false;
+        }
+      }
+      if (!isSize) {
+        this.$message.error('图片尺寸限制为200*200');
+      }
+      if (!isPNG) {
+        this.$message.error('上传图片只能是png格式');
+      }
+      if (!limit5M) {
+        this.$message.error('上传图片大小不能超过5MB');
+      }
+      return isSize && isPNG && limit5M;
     },
     // 产品开启图片上传
     productOpenImgUpload(response, file, fileList) {
@@ -1332,10 +1454,22 @@ export default {
         }
       }
       if (this.active === 2) {
-        this.active = 3;
-        this.checkEmail(); // 验证邮箱
-        this.checkPackage();
-        this.$cookies.set('active', this.active)
+        if (this.userLogin === false) {
+          this.active = 3;
+          this.checkEmail(); // 验证邮箱
+          this.checkPackage();
+          this.$cookies.set('active', this.active)
+          return false;
+        } else {
+          this.$refs.form.validate((valid) => {
+            if (valid) {
+              this.active = 3;
+              this.checkEmail(); // 验证邮箱
+              this.checkPackage();
+              this.$cookies.set('active', this.active)
+            }
+          })
+        }
         return false;
       }
       if (this.active === 3) {
@@ -1592,9 +1726,7 @@ export default {
           a 
             font-size 14px
             color blue
-            cursor pointer
-        .oemStyle
-          padding-top 20px    
+            cursor pointer 
       /* logo设置 */         
       .logo-config
         .cont 
@@ -1625,8 +1757,7 @@ export default {
       .introduceImg-config
         .cont 
           text-align left 
-          .wrapper
-            width 300px
+          .wrapper  
             margin-bottom 30px
             .title
               height 40px
@@ -1635,10 +1766,31 @@ export default {
                 vertical-align middle
                 margin-left 20px
             .introduceImg-list
-              .introduceImg-item 
+              display flex
+              .introduceImg-item
+                flex 1
                 margin-bottom 20px
+                .introduceImg-uploader
+                  width 120px
+                  border 1px dashed #d9d9d9
+                  border-radius 6px
+                  cursor pointer
+                  position relative
+                  overflow hidden
+                  &:hover 
+                    border-color #409EFF
+                  .introduceImg-uploader-icon 
+                    font-size 28px
+                    color #8c939d
+                    width 120px
+                    height 180px
+                    line-height 180px
+                    text-align center
+                  .introduceImg 
+                    width 120px
+                    height 180px
+                    display block
           img
-            margin 15px 0
             display inline-block
             width 120px
             height 180px  
@@ -1651,10 +1803,20 @@ export default {
       .file-config
         div 
           margin-bottom 30px
-      /* 风格设置 */
+      /* 颜色风格设置 */
       .color-config
         div 
           margin-bottom 30px
+        .oemColorStyle
+          padding-top 20px  
+          .color-group
+            span
+              display inline-block
+              width 30px
+              height 30px
+              border 1px solid #ccc 
+              cursor pointer
+              margin-right 10px  
       .allUI-config-wrapper
         padding 20px 50px 0
         button 
@@ -1670,8 +1832,8 @@ export default {
             font-weight 400
             margin-right 20px
           img 
-            width 200px 
-            height 150px
+            width 150px 
+            height 250px
             margin-right 10px
             border 1px solid #ccc
             vertical-align top
@@ -1680,6 +1842,10 @@ export default {
             margin-bottom 20px
           .img-box 
             padding-left 200px   
+            img 
+              width 100px
+              height 100px
+              background url('./imgs/bg.png') no-repeat
         .word
           img 
             width 26px     

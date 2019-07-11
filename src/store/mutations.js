@@ -50,6 +50,9 @@ export default{
 
   [GET_INTRODUCE_IMG](state, { introduceImgs, useIntroduceImg }) {
     state.introduceImgs = introduceImgs;
+    state.introduceImg1 = introduceImgs[0];
+    state.introduceImg2 = introduceImgs[1];
+    state.introduceImg3 = introduceImgs[2];
     state.useIntroduceImg = useIntroduceImg;
   }, 
   // 是否开启介绍图片
