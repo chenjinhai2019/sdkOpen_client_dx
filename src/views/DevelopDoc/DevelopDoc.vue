@@ -1,6 +1,6 @@
 <template>
   <div class="">
-      我是开发文档页面
+    我是开发文档页面
   </div>
 </template>
 
