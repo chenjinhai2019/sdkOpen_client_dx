@@ -140,7 +140,7 @@
                         :on-success="introduceImgUpload_1"
                         :limit="1">
                         <el-button slot="trigger" size="small" type="primary">选择</el-button>
-                        <!-- <el-button size="small" type="success" @click="submitUpload">点击上传</el-button>
+                        <el-button size="small" type="success" @click="submitUpload">点击上传</el-button>
                         <div slot="tip" class="el-upload__tip">只能上传png文件，且不超过5M</div> 
                       </el-upload>-->
                       <el-upload
@@ -290,24 +290,26 @@
                 <div>
                   服务协议：<el-input v-model="serviceAgreementUrl" placeholder="填写url或上传文件"></el-input>
                   <el-upload
-                    class="upload-demo"
                     action="/upload"
                     :limit="1"
+                    :show-file-list="false"
                     :on-success="serviceAgreementUpload">
                     <el-button size="small" type="primary">点击上传</el-button>
                   </el-upload>
-                  <a>点击此处下载模板</a>
+                  <p v-if="serviceAgreementDocument">{{serviceAgreementDocument}} <i class='delete' @click="deleteServiceFile">×</i></p>
+                  <a :href="serviceAgreementDocument">点击此处下载模板</a>
                 </div>
                 <div>
                   隐私声明：<el-input v-model="privacyStatementUrl" placeholder="填写url或上传文件"></el-input>
                   <el-upload
-                    class="upload-demo"
                     action="/upload"
                     :limit="1"
+                    :show-file-list="false"
                     :on-success="privacyStatementUpload">
                     <el-button size="small" type="primary">点击上传</el-button>
                   </el-upload>
-                  <a>点击此处下载模板</a>
+                  <p v-if="privacyStatementDocument">{{privacyStatementDocument}} <i class='delete' @click="deletePrivacyFile">×</i></p>
+                  <a :href="privacyStatementDocument">点击此处下载模板</a>
                 </div>
               </el-col>
             </el-row>
@@ -330,16 +332,25 @@
                   <div class="demonstration">tab颜色设置</div>
                   <el-color-picker v-model="tabRailingColor" @change="setOEMStyle"></el-color-picker>
                   <div class="color-group">
-                    <span style="background: red"></span>
-                    <span style="background: orange"></span>
-                    <span style="background: yellow"></span>
-                    <span style="background: green"></span>
-                    <span style="background: blue"></span>
+                    <span style="background: red" @click="setColor('ff0000')"></span>
+                    <span style="background: orange" @click="setColor('ffa500')"></span>
+                    <span style="background: yellow" @click="setColor('f5c32c')"></span>
+                    <span style="background: green" @click="setColor('008000')"></span>
+                    <span style="background: blue" @click="setColor('0000ff')"></span>
+                    <span style="background: black" @click="setColor('000000')"></span>
                   </div>
                 </div>
                 <div class="block">
                   <div class="demonstration">背景颜色设置</div>
                   <el-color-picker v-model="backgroundColor" @change="setOEMStyle"></el-color-picker>
+                  <div class="color-group">
+                    <span style="background: red" @click="setColor('','ff0000')"></span>
+                    <span style="background: orange" @click="setColor('','ffa500')"></span>
+                    <span style="background: yellow" @click="setColor('','f5c32c')"></span>
+                    <span style="background: green" @click="setColor('','008000')"></span>
+                    <span style="background: blue" @click="setColor('','0000ff')"></span>
+                    <span style="background: black" @click="setColor('','000000')"></span>
+                  </div>
                 </div>
               </el-col>
             </el-row>
@@ -438,7 +449,7 @@
             </div>
             <p>若用户需要登录App,需配置认证邮箱</p>
           </el-row>
-          <el-row class="hide-box" v-show="userLogin">
+          <el-row class="hide-box" v-show="!userLogin">
             <h3>认证邮箱</h3>
             <p>在用户注册的时候，需要用您的企业邮箱来给用户发送激活信息，请确保您所填邮箱的有效性。若您不填写该项，将默认使用晶讯邮箱发送给用户激活信息。</p>
             <el-form :model="form" ref="form" label-width="100px" :rules="rules">
@@ -1143,7 +1154,7 @@ export default {
     getAgreementAndStatement() {
       this.$axios.get('/oemApplication/ui/agreementAndStatement').then((res) => {
         const rs = res.data;
-        // console.log(rs);
+        console.log(rs);
         this.serviceAgreementUrl = rs.data.serviceAgreementUrl;
         this.privacyStatementUrl = rs.data.privacyStatementUrl;
         this.serviceAgreementDocument = rs.data.serviceAgreementDocument
@@ -1186,6 +1197,25 @@ export default {
       })
       this.changeAgreementAndStatement(params);
     },
+    // 删除服务协议和隐私声明
+    deleteServiceFile() {
+      const params = this.$qs.stringify({
+        serviceAgreementDocument: '',
+        privacyStatementDocument: this.privacyStatementDocument,
+        serviceAgreementUrl: this.serviceAgreementUrl,
+        privacyStatementUrl: this.privacyStatementUrl
+      })
+      this.changeAgreementAndStatement(params);
+    },
+    deletePrivacyFile() {
+      const params = this.$qs.stringify({
+        serviceAgreementDocument: this.serviceAgreementDocument,
+        privacyStatementDocument: '',
+        serviceAgreementUrl: this.serviceAgreementUrl,
+        privacyStatementUrl: this.privacyStatementUrl
+      })
+      this.changeAgreementAndStatement(params);
+    },
     // 获取OEM应用的风格设置
     getOEMStyle() {
       this.$axios.get('/oemApplication/ui/style').then((res) => {
@@ -1211,12 +1241,27 @@ export default {
         // console.log(this.tabRailingColor, this.backgroundColor);
       })
     },
+    // 点击直接设置颜色
+    setColor(tabColor, backColor) {
+      const tabRailingColor = tabColor || this.tabRailingColor.substr(1);
+      const backgroundColor = backColor || this.backgroundColor.substr(1);
+      console.log(tabRailingColor)
+      console.log(backgroundColor)
+      const params = this.$qs.stringify({
+        tabRailingColor,
+        backgroundColor
+      })
+      this.$axios.patch('/oemApplication/ui/style', params).then((res) => {
+        const rs = res.data;
+        this.getOEMStyle();
+      })
+    },
     // 显示所有ui配置
     allUiConfig() {
       this.$axios.get('/oemApplication/ui').then((res) => {
         const rs = res.data;
         if (rs.success === true) {
-          // console.log(rs);
+          console.log(rs);
           this.configData = rs.data;
           console.log(this.configData);
           this.uiIntroduceImgs = this.configData.introduceImg.split(';');
@@ -1230,12 +1275,14 @@ export default {
         }  
       })
     },
-    // 下载文件
+    // 所有UI配置 下载文件
+    // 服务协议
     downloadService() {
-
+      window.open(this.configData.serviceAgreementDocument);
     },
+    // 隐私声明
     downloadPrivacyStatement() {
-
+      window.open(this.configData.privacyStatementDocument);
     },
     toStartImg() {
       this.active = 1;
@@ -1285,7 +1332,9 @@ export default {
         console.log(rs);
         this.remoteService = rs.data.remoteService
         this.controlSigMesh = rs.data.controlSigMesh
-        this.userLogin = rs.data.userLogin
+        this.userLogin = rs.data.userLogin;
+        this.form.host = rs.data.host;
+        this.form.username = rs.data.username;
       })
     },
     // 修改OEM应用的功能配置
@@ -1721,12 +1770,7 @@ export default {
           p 
             font-size 18px
             line-height 30px 
-        .url-upload
-          padding-top 20px
-          a 
-            font-size 14px
-            color blue
-            cursor pointer 
+        
       /* logo设置 */         
       .logo-config
         .cont 
@@ -1801,6 +1845,19 @@ export default {
           margin-bottom 30px
       /* 服务协议设置 */
       .file-config
+        .url-upload
+          padding-top 20px
+          a 
+            font-size 14px
+            color blue
+            cursor pointer
+          .delete
+            cursor pointer
+            display inline-block
+            padding 5px
+            margin-left 20px
+            &:hover
+              color blue  
         div 
           margin-bottom 30px
       /* 颜色风格设置 */
@@ -1812,9 +1869,9 @@ export default {
           .color-group
             span
               display inline-block
-              width 30px
-              height 30px
-              border 1px solid #ccc 
+              width 25px
+              height 25px
+              border 1px solid #ccc
               cursor pointer
               margin-right 10px  
       .allUI-config-wrapper

@@ -2,9 +2,9 @@
   <div class="create-SDK">
     <el-row>
       <el-steps :active="sdkActive" finish-status="success" align-center>
-        <el-step title="App基本信息"></el-step>
-        <el-step title="注册服务"></el-step>
-        <el-step title="引用SDK"></el-step>
+        <el-step title="App基本信息" @click.native="step1"></el-step>
+        <el-step title="注册服务" @click.native="step2"></el-step>
+        <el-step title="引用SDK" @click.native="step3"></el-step>
       </el-steps>
     </el-row>
     <el-row class="step-containers">
@@ -148,6 +148,21 @@ export default {
     }
   },
   methods: {
+    step1() {
+      this.sdkActive = 0;
+      this.getBaseInfo();
+      this.$cookies.set('sdkActive', this.sdkActive)
+    },
+    step2() {
+      this.sdkActive = 1;
+      this.getUserLogin();
+      this.$cookies.set('sdkActive', this.sdkActive)
+    },
+    step3() {
+      this.sdkActive = 2;
+      this.getSDKInfo();
+      this.$cookies.set('sdkActive', this.sdkActive)
+    },
     // 获取App的基本信息
     getBaseInfo() {
       const { id, form } = this;
@@ -184,6 +199,8 @@ export default {
       this.$axios.get(`/sdk/${this.id}/userLogin`).then((res) => {
         const rs = res.data;
         this.userLogin = rs.data.userLogin;
+        this.hideForm.host = rs.data.host;
+        this.hideForm.username = rs.data.username;
       })
     },
     // 修改App的注册服务信息
