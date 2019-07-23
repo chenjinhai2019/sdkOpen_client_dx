@@ -13,6 +13,9 @@ import 'element-ui/lib/theme-chalk/index.css';
 import 'font-awesome/css/font-awesome.min.css'
 import './mock/mockServer'; 
 
+// import '../node_modules/bootstrap/dist/js/bootstrap.min';
+// import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+
 Vue.prototype.$qs = qs;
 Vue.prototype.$axios = axios; 
 Vue.prototype.$cookies = cookies;

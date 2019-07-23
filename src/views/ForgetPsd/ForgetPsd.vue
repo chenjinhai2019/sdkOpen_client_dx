@@ -10,16 +10,16 @@
       <div class="email-errTip errTip">{{emailErrTip}}</div>
     </el-row>
     <el-row class="inp-item">
-      <el-input v-model="password" clearable placeholder="密码" @focus="passwordTip=true" @blur="passwordTip=false"></el-input>
+      <el-input v-model="password" show-password clearable placeholder="密码" @focus="passwordTip=true" @blur="checkFormat()"></el-input>
       <ul class="tip password-tip" v-show="passwordTip">
-        <li>* 密码可由字母、数字、标点符号组成</li>
+        <li>* 以字母开头</li>
+        <li>* 可由字母、数字、标点符号组成</li>
         <li>* 6-16个字符</li>
-        <li>* 字母、数字和标点符号至少包含两种</li>
       </ul>
       <div class="password-errTip errTip">{{passwordErrTip}}</div>
     </el-row>
     <el-row class="inp-item">
-      <el-input v-model="checkPsd" clearable placeholder="确认密码" @focus="checkPsdTip=true" @blur="checkPsdTip=false"></el-input>
+      <el-input v-model="checkPsd" show-password clearable placeholder="确认密码" @focus="checkPsdTip=true" @blur="checkPsdTip=false"></el-input>
       <ul class="tip checkPsd-tip" v-show="checkPsdTip">
         <li>* 请再次输入您的密码</li>
       </ul>
@@ -60,9 +60,28 @@ export default {
     }
   },
   methods: {
+    // 检查密码邮箱格式
+    checkFormat() {
+      let { password } = this;
+      this.passwordTip = false;
+      // /^(?=.{6,16})(?=.*[a-z])(?=.*[0-9])[0-9a-z]*$/
+      const regPsd = /^[A-z][\w?!@#$%^&*,.?;]{5,15}$/;
+      if (password === '') {
+        this.passwordErrTip = '请输入密码'
+        this.timer = setTimeout(() => {
+          this.passwordErrTip = '';   
+        }, 2000)
+      } else if (!regPsd.test(password)) {
+        this.passwordErrTip = '密码格式不正确';
+        this.timer = setTimeout(() => {
+          this.passwordErrTip = '';   
+        }, 2000)
+      }
+    },
     changePsd() {
       let { email, password, checkPsd, captcha, validator } = this;
       const regEmail = /^[A-Za-zd]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/;
+      const regPsd = /^[A-z][\w?!@#$%^&*,.?;]{5,15}$/;
       if (email === '') {
         this.emailErrTip = '请输入邮箱'
         this.timer = setTimeout(() => {
@@ -76,6 +95,11 @@ export default {
       }
       if (password === '') {
         this.passwordErrTip = '请输入密码'
+        this.timer = setTimeout(() => {
+          this.passwordErrTip = '';   
+        }, 2000)
+      } else if (!regPsd.test(password)) {
+        this.passwordErrTip = '密码格式不正确';
         this.timer = setTimeout(() => {
           this.passwordErrTip = '';   
         }, 2000)

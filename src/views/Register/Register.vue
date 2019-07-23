@@ -19,7 +19,7 @@
       <div class="email-errTip errTip">{{emailErrTip}}</div>
     </el-row>
     <el-row class="inp-item">
-      <el-input v-model="password" show-password clearable placeholder="密码" @focus="passwordTip=true" @blur="passwordTip=false"></el-input>
+      <el-input v-model="password" show-password clearable placeholder="密码" @focus="passwordTip=true" @blur="checkFormat()"></el-input>
       <ul class="tip password-tip" v-show="passwordTip">
         <li>* 密码可由字母、数字、标点符号组成</li>
         <li>* 6-16个字符</li>
@@ -80,9 +80,28 @@ export default {
     
   },
   methods: {
+    // 检查密码邮箱格式
+    checkFormat() {
+      let { password } = this;
+      this.passwordTip = false;
+      // /^(?=.{6,16})(?=.*[a-z])(?=.*[0-9])[0-9a-z]*$/
+      const regPsd = /^[A-z][\w?!@#$%^&*,.?;]{5,15}$/;
+      if (password === '') {
+        this.passwordErrTip = '请输入密码'
+        this.timer = setTimeout(() => {
+          this.passwordErrTip = '';   
+        }, 2000)
+      } else if (!regPsd.test(password)) {
+        this.passwordErrTip = '密码格式不正确';
+        this.timer = setTimeout(() => {
+          this.passwordErrTip = '';   
+        }, 2000)
+      }
+    },
     register() {
       let { email, username, password, checkPsd, captcha, validator, isChecked } = this;
       const regEmail = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;  
+      const regPsd = /^[A-z][\w?!@#$%^&*,.?;]{5,15}$/;
       if (username === '') {
         this.usernameErrTip = '请输入用户名'
         this.timer = setTimeout(() => {
@@ -103,6 +122,11 @@ export default {
       if (password === '') {
         validator = false;
         this.passwordErrTip = '请输入密码'
+        this.timer = setTimeout(() => {
+          this.passwordErrTip = '';   
+        }, 2000)
+      } else if (!regPsd.test(password)) {
+        this.passwordErrTip = '密码格式不正确';
         this.timer = setTimeout(() => {
           this.passwordErrTip = '';   
         }, 2000)
