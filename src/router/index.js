@@ -75,7 +75,7 @@ const router = new Router({
                 hideHeader: true,
                 activeMenu: '/manageCenter/applicationManage'
               },
-            }, 
+            },
             {
               path: 'sdkApply',
               name: 'sdkApply',
@@ -101,13 +101,13 @@ const router = new Router({
         {
           path: 'productManage',
           name: 'productManage',
-          redirect: '/manageCenter/productManage/product', 
+          redirect: '/manageCenter/productManage/product',
           component: resolve => require(['views/ManageCenter/ProductManage/ProductManage'], resolve),
           meta: {
             hideHeader: true
           },
           children: [
-            { path: 'product', 
+            { path: 'product',
               name: 'product',
               component: resolve => require(['views/ManageCenter/ProductManage/Product'], resolve),
               meta: {
@@ -116,7 +116,7 @@ const router = new Router({
                 activeMenu: '/manageCenter/productManage'
               }
             },
-            { path: 'accessories', 
+            { path: 'accessories',
               name: 'accessories',
               component: resolve => require(['views/ManageCenter/ProductManage/TMAccessories'], resolve),
               meta: {
@@ -125,7 +125,7 @@ const router = new Router({
                 activeMenu: '/manageCenter/productManage'
               }
             },
-            { path: 'createProduct', 
+            { path: 'createProduct',
               name: 'createProduct',
               component: resolve => require(['views/ManageCenter/ProductManage/CreateProduct'], resolve),
               meta: {
@@ -144,6 +144,69 @@ const router = new Router({
             hideHeader: true
           }
         },
+        // homeKit
+        {
+          path: 'homeKitManage',
+          name: 'homeKitManage',
+          redirect: '/manageCenter/HomeKitManage/basicInfo',
+          component: resolve => require(['views/ManageCenter/HomeKitManage/HomeKitManage'], resolve),
+          meta: {
+            hideHeader: true
+          },
+          children: [
+            { path: 'basicInfo',
+              name: 'basicInfo',
+              component: resolve => require(['views/ManageCenter/HomeKitManage/HomeKitBasicInfo'], resolve),
+              meta: {
+                hideHeader: true,
+                showHomeKitMenu: true,
+                showHomeKitItemMenu: false,
+                activeMenu: '/manageCenter/homeKitManage'
+              }
+            },
+            { path: 'appManage',
+              name: 'appManage',
+              component: resolve => require(['views/ManageCenter/HomeKitManage/HomeKitApp'], resolve),
+              meta: {
+                hideHeader: true,
+                showHomeKitMenu: true,
+                showHomeKitItemMenu: false,
+                activeMenu: '/manageCenter/homeKitManage'
+              }
+            },
+            { path: 'createApp',
+              name: 'createApp',
+              component: resolve => require(['views/ManageCenter/HomeKitManage/CreateApp'], resolve),
+              meta: {
+                hideHeader: true,
+                showHomeKitMenu: true,
+                showHomeKitItemMenu: false,
+                activeMenu: '/manageCenter/homeKitManage'
+              }
+            },
+            { path: 'staging',
+              name: 'staging',
+              component: resolve => require(['views/ManageCenter/HomeKitManage/Staging'], resolve),
+              meta: {
+                hideHeader: true,
+                showHomeKitMenu: true,
+                showHomeKitItemMenu: false,
+                activeMenu: '/manageCenter/homeKitManage'
+              }
+            },
+            { path: 'tokens',
+              name: 'tokens',
+              component: resolve => require(['views/ManageCenter/HomeKitManage/tokens'], resolve),
+              meta: {
+                hideHeader: true,
+                showHomeKitMenu: true,
+                showHomeKitItemMenu: false,
+                activeMenu: '/manageCenter/homeKitManage'
+              }
+            },
+          ]
+        },
+
       ],
     },
     // 账号管理

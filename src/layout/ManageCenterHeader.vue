@@ -10,6 +10,7 @@
         <el-menu :default-active="activeMenu" active-text-color="#1890ff" mode="horizontal" :router="true">
           <el-menu-item index="/manageCenter/applicationManage">应用管理</el-menu-item>
           <el-menu-item index="/manageCenter/productManage">产品管理</el-menu-item>
+          <el-menu-item index="/manageCenter/homeKitManage">HomeKit应用管理</el-menu-item>
           <el-menu-item index="/manageCenter/valueService">增值服务</el-menu-item>
         </el-menu>
       </el-col>
@@ -46,7 +47,7 @@ import { mapState } from 'vuex'
 
 export default {
   name: '',
-  data() { 
+  data() {
     return {
 
     }
@@ -65,7 +66,7 @@ export default {
     },
   },
   mounted() {
-    
+
   },
   methods: {
     logout() {
@@ -87,22 +88,22 @@ export default {
   .el-row
     display flex
     align-items center
-    .logo 
+    .logo
       width 200px
       height 40px
       img
         height 40px
     .managecenter-menu
-      flex 3  
+      flex 3
       min-width 400px
     .right-box
       flex 1
-      min-width 202px 
+      min-width 202px
       float right
       display flex
-      justify-content flex-end 
+      justify-content flex-end
       .link-box
-        a:hover 
+        a:hover
           color #333
       .welcome-wrap
         margin 0 30px
