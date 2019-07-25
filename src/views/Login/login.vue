@@ -80,7 +80,7 @@ export default {
             user,
           }
           this.$store.dispatch('userInfo', userInfo);
-          const expiresTime = new Date(new Date().getTime() + (60 * 60 * 1000))
+          const expiresTime = new Date(new Date().getTime() + (30 * 60 * 1000))
           Cookies.set('username', user, { expires: expiresTime });
           // 登录后跳转到首页
           this.timer = setTimeout(() => {

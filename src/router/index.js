@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import cookies from 'js-cookie'
 
 Vue.use(Router);
 
@@ -238,8 +239,10 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
+  const accessFlag = cookies.get('username');
+  
   if (to.matched.some(res => res.meta.requireAuth)) { // 判断是否需要登录权限
-    if (document.cookie.indexOf('username') !== -1) { // 已登录
+    if (accessFlag) { // 已登录 document.cookie.indexOf('username') !== -1
       next()
     } else { // 未登录
       next({

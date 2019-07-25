@@ -3,7 +3,12 @@
     <div class="main-wrap">
       <div class="menu-wrapper">
         <div class="search-box">
-          <el-input v-model="keyword" size="medium" suffix-icon="el-icon-search"></el-input>
+          <el-input v-model="keyword" size="medium" suffix-icon="el-icon-search" @blur="search()"></el-input>
+         <!--  <div class="search-cont">
+            <ul>
+              <li v-for="(item,index) in searchData" :key="index">{{item.title}}</li>
+            </ul>
+          </div> -->
         </div>
         <ul class="developDoc-menu">
           <li class="nav-item">
@@ -47,6 +52,7 @@ export default {
       docCont: '',
       activeId: '',
       keyword: '',
+      searchData: [],
     }
   },
   created() {
@@ -77,6 +83,21 @@ export default {
         console.log(rs);
         this.docCont = rs.data.content;
       })
+    },
+    // 搜索
+    search() {
+      const { keyword } = this;
+      if (keyword === '') {
+        return;
+      }
+      const params = {
+        keyword
+      }
+      this.$axios.get('/document/search', { params }).then((res) => {
+        console.log(res.data);
+        const rs = res.data;
+        this.searchData = rs.data;
+      })
     }
   },
   components: {
@@ -100,6 +121,31 @@ export default {
       margin-top 20px
       .el-input
         width 80%
+      .search-cont
+        width 250px
+        border 1px solid #333
+        background #fff
+        position absolute
+        top 155px
+        z-index 999
+        padding 20px
+        &::before
+          content ''
+          position absolute
+          left 20px
+          top -10px
+          width 0
+          height 0
+          border-left 5px solid transparent
+          border-top 5px solid transparent
+          border-bottom 5px solid #666
+          border-right 5px solid transparent
+        li 
+          height 30px
+          line-height 30px
+          cursor pointer
+          &:hover
+            color #409EFF
     .developDoc-menu
       padding-top 20px
       .nav-item
@@ -122,7 +168,7 @@ export default {
             line-height 26px
             margin-top 15px
         .nav-item-list
-          padding-left 10px    
+          padding-left 20px    
   .cont-wrapper
     flex 1
     padding 20px
