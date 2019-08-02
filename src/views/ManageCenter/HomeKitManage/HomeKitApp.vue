@@ -143,12 +143,13 @@ export default {
     height 650px
     overflow-y scroll
   .product-list
+    width 1080px
     display flex
     flex-wrap wrap
-    padding 20px
     li
-      min-width 250px
+      width 250px
       height 215px
+      box-sizing border-box
       border 1px solid #333
       border-radius 20px
       margin-right 20px
